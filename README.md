@@ -2,7 +2,7 @@
 ---
 🛰️ Project Nzi – Autonomous Swarm Agents with Decentralized Intelligence
 
-*Project Nzi* is a research-grade open-source platform for simulating and deploying intelligent drone/robot swarms using decentralized, Web4-native technologies.
+*Project Nzi* is a decentralized AI-powered bot swarm system designed to simulate and deploy autonomous agents (like drones or patrol bots) that think and act collaboratively using symbolic reasoning (via MeTTa), real-time training (in Unity), and secure communication on the blockchain (via Robonomics). Built with Rust at its core, the project aims to enable smart, self-organizing units for defense, disaster response, or remote surveillance—without relying on centralized control systems.
 
 ---
 
