@@ -5,6 +5,7 @@ resolver = "2"
 members = [
     "rust-core",
     "rust-server",
+    "rust-swarm",
     "zk-rust",
 ]
 

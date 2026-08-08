@@ -1,0 +1,13 @@
+[package]
+name = "nzi-swarm"
+version = "0.0.1"
+description = "Project Nzi headless SoNS swarm: neighbor-local coordination, self-organizing hierarchy, stigmergy (Phase 4)"
+edition.workspace = true
+license.workspace = true
+authors.workspace = true
+
+[dependencies]
+
+[[bin]]
+name = "swarm-demo"
+path = "src/bin/swarm_demo.rs"

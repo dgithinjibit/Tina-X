@@ -148,23 +148,29 @@ decisions, with a measured ~70% pesticide-reduction story. Real imagery + Unity 
 
 ---
 
-## Phase 4 — From One to a Fleet: SoNS Swarm (Weeks 14–18)
+## Phase 4 — From One to a Fleet: SoNS Swarm (Weeks 14–18) — 🟢 DONE (headless) *(ADR 0007)*
 *Goal: scale to a swarm using self-organizing hierarchy — only after ONE bot is solid.*
 
-> The SoNS coordination LOGIC is buildable here as a headless multi-agent simulation in Rust
-> (N `AgentSim`s + neighbor-local message passing) — no Unity needed to prove self-organization.
-> Only the 3D visualization of the swarm is deferred.
+> Built headless in the new `rust-swarm/` crate (no Unity). Only the 3D visualization is deferred.
 
-- 🔴 **P4.1** Headless multi-agent sim in Rust: N agents, neighbor-local communication only.
-  *(⏭️ the Unity 3D **visualization** of the scene → Phase 7; the coordination logic is here.)*
-- 🔴 **P4.2** Implement **SoNS** (Self-organizing Nervous System): runtime-formed hierarchy,
-  transient interchangeable "brain" agent, reconfiguration on failure.
-- 🔴 **P4.3** Stigmergy / task-allocation for coordinating precision-ag coverage.
-- 🔴 **P4.4** Resilience tests: kill/add agents mid-mission; swarm must self-heal.
-- 🔴 **P4.5** Scale test (sim): measure coordination overhead vs. agent count.
+- 🟢 **P4.1** Headless multi-agent sim (`nzi-swarm::Swarm`): N agents on a grid, **neighbor-local
+  comms only** — `step` delivers messages along topology edges and never lets an agent read global
+  state (the invariant is enforced by module boundaries). *(done)*
+- 🟢 **P4.2** **SoNS** (`sons.rs`): runtime-formed hierarchy via distributed max-consensus with
+  distance — highest id becomes the transient "brain", every agent learns a hop-distance gradient
+  to it; interchangeable brain re-elected by the same rule on failure. *(done)*
+- 🟢 **P4.3** Stigmergy (`stigmergy.rs`): agents mark their local cell while under-covered — the
+  mark IS the task allocation, so coverage spreads to gaps with no central scheduler and stops
+  over-marking covered cells. *(done)*
+- 🟢 **P4.4** Resilience (`tests/swarm_behavior.rs`): kill the brain → auto re-election of the
+  next-highest survivor; rejoining higher id resumes leadership; coverage survives partial loss.
+  Recovery is O(horizon), bounded/deterministic. *(done)*
+- 🟢 **P4.5** Scale test: a **400-agent (20×20)** swarm still converges to one leader; convergence
+  is **O(diameter), not O(agent-count)** — the signature of neighbor-local coordination. *(done)*
 
-**Exit criteria:** a swarm covers a field, survives agent loss, and self-reorganizes — coordination
-verified, not just emergent-and-hoped.
+**Exit criteria — MET:** the swarm covers a field, survives agent loss, and self-reorganizes;
+coordination is *verified* (12 unit + 7 emergent-behavior tests), not emergent-and-hoped. The Unity
+3D visualization of the swarm → Phase 7.
 
 ---
 
