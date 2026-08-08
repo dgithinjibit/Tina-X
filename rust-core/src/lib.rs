@@ -12,6 +12,7 @@
 //!
 //! So the reflex loop here is a delayed-PD stabilizer with a hard latency budget.
 
+pub mod brain;
 pub mod reflex;
 
 /// Hard latency budget for a single reflex step, in microseconds.

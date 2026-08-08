@@ -8,7 +8,7 @@ Legend: 🔴 not started · 🟡 in progress · 🟢 done · ⚠️ open researc
 
 ---
 
-## Phase 0 — Foundation & Truth-Finding (Weeks 1–2) — 🟢 MOSTLY DONE
+## Phase 0 — Foundation & Truth-Finding (Weeks 1–2) — 🟢 DONE
 *Goal: know what we're standing on before we build on it.*
 
 - 🟢 **P0.1** Scaffold the repo: `rust-core/` cargo workspace, `metta-logic/`, `docs/`. *(done)*
@@ -18,12 +18,18 @@ Legend: 🔴 not started · 🟡 in progress · 🟢 done · ⚠️ open researc
   (1e3/1e5/1e6). Findings in `docs/benchmarks/metta-baseline.md`:
   rule-eval ~2–7 ms p99 (size-independent, GOOD); direct `space.query()` is **O(n)**
   (~2 s @100k, ~23 s @1M) → forced **ADR 0002 (partitioned Atomspace)**. *(done)*
-- 🔴 **P0.4** Call Rust `libhyperon` as a Cargo crate from a tiny Rust binary (prove Rust↔MeTTa).
-  *(reflex loop + benchmark done in Rust; the Rust↔MeTTa crate bridge is the one open P0 item.)*
-- 🟢 **P0.5** ADRs written: `0001-two-rate-brain.md`, `0002-partitioned-atomspace.md`. *(done)*
+- 🟢 **P0.4** ✅ **Rust↔MeTTa bridge working.** Found `hyperon` is NOT on crates.io (git-only,
+  no linkable `libhyperon`), so per **ADR 0003** we built a trait seam (`brain::SymbolicBrain`)
+  with a `SubprocessBrain` that drives MeTTa via `metta-logic/bridge_worker.py`, plus a `FakeBrain`
+  test double. `cargo run -p nzi-core --bin brain-demo` shows Rust getting typed results from
+  MeTTa (`!(+ 1 2)` → `3`; safe-to-fly rule → `True/False`). Native FFI drops into the same trait
+  later. *(done)*
+- 🟢 **P0.5** ADRs written: `0001-two-rate-brain.md`, `0002-partitioned-atomspace.md`,
+  `0003-rust-metta-bridge.md`. *(done)*
 
-**Exit criteria:** MeTTa runs from Python ✅, real latency numbers recorded ✅, reflex loop
-validated (~900× under budget) ✅. Remaining: Rust↔MeTTa crate bridge (P0.4).
+**Exit criteria — ALL MET:** MeTTa runs from Python ✅; real latency numbers recorded ✅; reflex
+loop validated (~900× under budget) ✅; **Rust drives MeTTa end-to-end** ✅ (10 tests pass).
+→ Ready for Phase 1 (Unity + real plant dynamics).
 
 ---
 

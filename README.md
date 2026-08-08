@@ -103,11 +103,12 @@ project-nzi/
 ├── limitations-edge-cases/ # What holds agents back + our mitigations (cited)
 ├── weather-prediction/     # Harsh-weather nowcasting edge case (cited)
 │
-├── rust-core/              # (to be built) agent core, reflex loop, telemetry
-├── metta-logic/            # (to be built) symbolic reasoning + verification rules
-├── unity-sim/              # (to be built) ML-Agents scenes, synthetic data
-├── robonomics-integration/ # (to be built) identity, telemetry, missions
-└── docs/                   # architecture decisions, benchmarks
+├── rust-core/              # agent core: reflex loop (fast) + MeTTa brain bridge (slow)
+│   └── src/reflex.rs, brain.rs   # + bins: reflex-demo, brain-demo; tests/ integration
+├── metta-logic/            # symbolic layer: smoke test, benchmark, Rust bridge worker
+├── unity-sim/              # (to be built, Phase 1) ML-Agents scenes, synthetic data
+├── robonomics-integration/ # (to be built, Phase 6) identity, telemetry, missions
+└── docs/                   # ADRs (0001–0003), benchmarks, DEV_SETUP
 ```
 
 ---
