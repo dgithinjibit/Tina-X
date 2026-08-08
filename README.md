@@ -37,6 +37,15 @@ so communities and the swarm itself can act before the storm. See
 **Secondary narrative — Environmental & ecosystem monitoring.**
 Air/water/biodiversity sensing with the same cheap, resilient agents.
 
+**Flagship reasoning application — [TINA-X](./tina-x/).**
+A symbolic **cascading-failure reasoner**: a digital twin of society's fragility. It ingests
+infrastructure dependencies (hospitals, grids, roads, fuel, data centers) into a MeTTa Atomspace
+and *deduces* catastrophic cascades from compound "black swan" events it was never trained on
+(earthquake → grid down → generator needs fuel → typhoon floods the road → hospital fails). This
+is where symbolic AI beats deep learning. TINA-X is an **independent component** — it runs and is
+tested standalone, and can optionally push alerts to the Nzi dashboard (see ADR 0005). Nzi's cheap
+sensor-swarm becomes one of TINA-X's live data feeds.
+
 ---
 
 ## 🧬 The idea: borrow the fly's design
@@ -109,6 +118,7 @@ project-nzi/
 ├── frontend/               # React + TypeScript landing / dashboard (Vite + Vitest)
 ├── zk-rust/                # ZK POC (arkworks Groth16): verifiable agent decisions
 ├── zk-cairo/               # ZK POC (Cairo/Scarb): same rule, Starknet-native on-chain target
+├── tina-x/                 # 🌍 TINA-X: symbolic cascading-failure reasoner (INDEPENDENT component)
 ├── metta-logic/            # symbolic layer: smoke test, benchmark, Rust bridge worker
 ├── unity-sim/              # (to be built, Phase 1) ML-Agents scenes, synthetic data
 ├── robonomics-integration/ # (to be built, Phase 6) identity, telemetry, missions

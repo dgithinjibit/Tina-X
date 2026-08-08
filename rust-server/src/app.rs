@@ -1,10 +1,11 @@
 //! HTTP + WebSocket API (axum). Thin layer: it just exposes [`crate::sim`] and [`crate::bom`].
 //!
 //! # Endpoints (the contract the React app depends on)
-//! - `GET /api/health`  -> `{"status":"ok"}`                 (liveness check)
-//! - `GET /api/bom`     -> the bill of materials (JSON)       (IoT hardware list for judges)
-//! - `GET /api/status`  -> current agent status (JSON)        (health + last latency)
-//! - `GET /ws`          -> WebSocket streaming ReflexSample    (live telemetry, ~30/s)
+//! - `GET  /api/health`  -> `{"status":"ok"}`                 (liveness check)
+//! - `GET  /api/bom`     -> the bill of materials (JSON)       (IoT hardware list for judges)
+//! - `GET  /api/status`  -> current agent status (JSON)        (health + last latency)
+//! - `POST /api/alerts`  -> accept cascade alerts from TINA-X  (OPTIONAL component; see ADR 0005)
+//! - `GET  /ws`          -> WebSocket streaming ReflexSample    (live telemetry, ~30/s)
 //!
 //! # For a junior dev
 //! `build_router()` is separated from `serve()` so tests can exercise the routes WITHOUT binding
@@ -12,9 +13,10 @@
 
 use axum::extract::ws::{Message, WebSocket, WebSocketUpgrade};
 use axum::response::IntoResponse;
-use axum::routing::get;
+use axum::routing::{get, post};
 use axum::{Json, Router};
 use nzi_core::telemetry::TelemetryMsg;
+use serde::{Deserialize, Serialize};
 use std::time::Duration;
 use tower_http::cors::CorsLayer;
 
@@ -27,6 +29,7 @@ pub fn build_router() -> Router {
         .route("/api/health", get(health))
         .route("/api/bom", get(bom))
         .route("/api/status", get(status))
+        .route("/api/alerts", post(alerts))
         .route("/ws", get(ws_upgrade))
         // Allow the React dev server (a different origin) to call us during development.
         .layer(CorsLayer::permissive())
@@ -49,6 +52,37 @@ async fn status() -> impl IntoResponse {
         sim.tick();
     }
     Json(sim.status())
+}
+
+// --- TINA-X alert intake (OPTIONAL component integration; ADR 0005) --------------------------
+//
+// TINA-X is an INDEPENDENT component that may push cascade alerts here. This endpoint accepts
+// them so the Nzi dashboard can display societal-fragility warnings alongside agent telemetry.
+// Nzi does not depend on TINA-X; this endpoint simply exists for TINA-X to POST to if it wants.
+
+/// One cascade alert coming from TINA-X (matches tina-x/tina_x/bridge.py's JSON).
+#[derive(Debug, Clone, Serialize, Deserialize)]
+pub struct CascadeAlert {
+    pub kind: String,
+    pub node: String,
+    pub message: String,
+}
+
+/// The payload TINA-X POSTs to `/api/alerts`.
+#[derive(Debug, Clone, Serialize, Deserialize)]
+pub struct AlertBatch {
+    pub source: String,
+    pub alerts: Vec<CascadeAlert>,
+}
+
+/// Accept a batch of TINA-X alerts. For now we acknowledge receipt (and could fan them out to the
+/// dashboard WebSocket in a later step). Returns how many were accepted.
+async fn alerts(Json(batch): Json<AlertBatch>) -> impl IntoResponse {
+    // In a fuller build we'd broadcast these to connected dashboards; the POC acknowledges them.
+    Json(serde_json::json!({
+        "accepted": batch.alerts.len(),
+        "source": batch.source,
+    }))
 }
 
 /// Upgrade a plain HTTP request to a WebSocket and start streaming telemetry.
@@ -90,7 +124,7 @@ async fn stream_telemetry(mut socket: WebSocket) {
 pub async fn serve(addr: &str) -> std::io::Result<()> {
     let listener = tokio::net::TcpListener::bind(addr).await?;
     println!("Nzi mission-control API listening on http://{addr}");
-    println!("  GET /api/health  GET /api/bom  GET /api/status  WS /ws");
+    println!("  GET /api/health  GET /api/bom  GET /api/status  POST /api/alerts  WS /ws");
     axum::serve(listener, build_router()).await
 }
 
@@ -118,5 +152,29 @@ mod tests {
         assert_eq!(resp.status(), axum::http::StatusCode::OK);
         // Sanity: the underlying data is non-empty and cheap (covered deeply in bom tests).
         assert!(!reference_bom().items.is_empty());
+    }
+
+    #[tokio::test]
+    async fn alerts_handler_accepts_a_tina_x_batch() {
+        // Simulate the JSON TINA-X's bridge.py posts; the handler should accept all of them.
+        let batch = AlertBatch {
+            source: "Earthquake + Typhoon (compound)".to_string(),
+            alerts: vec![CascadeAlert {
+                kind: "hospital-critical".to_string(),
+                node: "hospital-B".to_string(),
+                message: "hospital-B has LOST POWER".to_string(),
+            }],
+        };
+        let resp = alerts(Json(batch)).await.into_response();
+        assert_eq!(resp.status(), axum::http::StatusCode::OK);
+    }
+
+    #[test]
+    fn alert_batch_round_trips_the_bridge_json_shape() {
+        // Lock the contract with tina-x/tina_x/bridge.py: {source, alerts:[{kind,node,message}]}.
+        let json = r#"{"source":"x","alerts":[{"kind":"datacenter-down","node":"dc-1","message":"m"}]}"#;
+        let batch: AlertBatch = serde_json::from_str(json).unwrap();
+        assert_eq!(batch.alerts.len(), 1);
+        assert_eq!(batch.alerts[0].node, "dc-1");
     }
 }

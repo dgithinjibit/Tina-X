@@ -139,6 +139,11 @@ verified, not just emergent-and-hoped.
   prove/verify) + `zk-cairo/` (Starknet-native mirror). Per ADR 0004: build in Rust, settle
   on-chain in Cairo later. Next statement: prove a decision came from the signed MeTTa ruleset;
   eventually attach proofs to on-chain telemetry (ties into P6.1 Robonomics).
+- **TINA-X (flagship reasoning app)** — 🟢 core built: `tina-x/` independent component
+  (ADR 0005). MeTTa dependency graph + cascading-failure rules + Python black-swan injector +
+  optional Nzi-dashboard bridge (verified end-to-end). Next: OSM ingestion (real region),
+  live API feeds (USGS/NOAA/DSCOVR), supply-chain + space-weather modules, and ZK-attested alerts.
+  Grows independently of the robotics phases; Nzi's swarm becomes one of its sensor feeds.
 - **YC readiness** — after Phase 3, we have a demoable wedge that maps to YC's named ag-robotics RFS.
 
 ---
