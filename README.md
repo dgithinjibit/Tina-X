@@ -120,9 +120,9 @@ project-nzi/
 ├── zk-cairo/               # ZK POC (Cairo/Scarb): same rule, Starknet-native on-chain target
 ├── tina-x/                 # 🌍 TINA-X: symbolic cascading-failure reasoner (INDEPENDENT component)
 ├── metta-logic/            # symbolic layer: smoke test, benchmark, Rust bridge worker
-├── unity-sim/              # Phase 1 sim SCAFFOLD (C# ML-Agents + Rust bridge contract; build in Unity)
-├── robonomics-integration/ # (to be built, Phase 6) identity, telemetry, missions
-└── docs/                   # ADRs (0001–0003), benchmarks, scaling/, DEV_SETUP
+├── unity-sim/              # SCAFFOLD (C# ML-Agents + Rust bridge contract); built in Phase 7 (needs Unity)
+├── robonomics-integration/ # (to be built, Phase 6) identity, telemetry, missions — on testnet
+└── docs/                   # ADRs (0001–0005), benchmarks, scaling/, DEV_SETUP
 ```
 
 ---

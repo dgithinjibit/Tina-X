@@ -4,7 +4,14 @@
 > *measured*. We do NOT lock in architecture before we benchmark. Each phase raises the two
 > feasibility numbers (maturity ~30–40%, arch-fit ~25–35%) with evidence, not optimism.
 
-Legend: 🔴 not started · 🟡 in progress · 🟢 done · ⚠️ open research risk
+Legend: 🔴 not started · 🟡 in progress · 🟢 done · ⚠️ open research risk · ⏭️ deferred (needs a tool outside this dev env)
+
+> **Build-here-first pivot (2026-08-08).** We code everything that runs in this environment now,
+> and defer ONLY what genuinely needs another tool. Two things move to the final **Phase 7 —
+> External Runtimes**: (1) anything needing the **Unity engine** (the sim scenes), and (2)
+> **physical hardware**. Everything else stays in place — including **on-chain work on a
+> testnet** (reachable now) and **external live-API** integrations (kept optional/mockable so
+> tests never require the internet). Deferred items are tagged ⏭️ and cross-linked to Phase 7.
 
 ---
 
@@ -36,48 +43,71 @@ loop validated (~900× under budget) ✅; **Rust drives MeTTa end-to-end** ✅ (
 ## Phase 1 — One Simulated Bot: the Reflex Loop (Weeks 3–5)
 *Goal: a single agent that flies/moves stably in simulation. No intelligence yet — just the fly's spine.*
 
-> **Split for this environment:** Unity/C# can't compile in the authoring container, so the
-> control side (fully testable here) is built and green in Rust, and the Unity side is written
-> as *scaffold* to open locally. Everything verifiable lives on the Rust side.
+> **Build-here split:** the control side (fully testable here) is built and green in Rust. The
+> parts that need the **Unity engine** to be meaningful (a real physics plant + obstacles) are
+> deferred to **Phase 7**; a scaffold to open locally already exists in `unity-sim/`.
 
-- 🟡 **P1.1** Unity ML-Agents scene: one agent, physics, a few obstacles.
-  *Scaffolded in `unity-sim/` (C# `NziAgent`/`ReflexBridgeClient` + `SCENE_SETUP.md`); build in
-  the editor locally. Not compiled here — Rust owns the control loop.*
+- ⏭️ **P1.1 → Phase 7** Unity ML-Agents scene: one agent, physics, a few obstacles.
+  *Scaffolded in `unity-sim/` (C# `NziAgent`/`ReflexBridgeClient` + `SCENE_SETUP.md`); needs the
+  Unity editor, so it's built in Phase 7.*
 - 🟢 **P1.2** Rust reflex loop: **3-axis delayed-PD stabilizer** (`reflex::AttitudeStabilizer`,
   roll/pitch/yaw) driven by simulated rate gyros, budgeted **<13 ms** (fly halteres spec), running
   at 500 Hz. Unity↔Rust bridge contract (`unity_bridge.rs` + `unity-sim/BRIDGE_CONTRACT.md`) is
   defined and unit-tested end-to-end (reading → stabilizer → command converges on all axes). *(done)*
-- 🔴 **P1.3** Optic-flow-style obstacle avoidance (start crude — inter-sensor flow difference).
-- 🔴 **P1.4** Collision *tolerance*: verify the agent recovers from bumps (crash-and-recover),
-  don't over-engineer avoidance.
-- 🟡 **P1.5** Telemetry stream out of the agent (feeds the symbolic brain in Phase 2).
-  *3-axis telemetry (`AttitudeSample`) now streams from the sim to the dashboard (per-axis
-  charts + brain-decision panel). Real obstacle/nav telemetry follows in P1.3.*
+- ⏭️ **P1.3 → Phase 7** Optic-flow obstacle avoidance *against the Unity scene*. (A crude
+  Rust-side optic-flow *model* could be prototyped here first if we want; the real validation
+  needs the 3D scene.)
+- ⏭️ **P1.4 → Phase 7** Collision *tolerance* (crash-and-recover) — needs physical contacts from
+  the Unity physics engine to be meaningful.
+- 🟢 **P1.5** Telemetry stream out of the agent (feeds the symbolic brain in Phase 2).
+  *3-axis telemetry (`AttitudeSample`) streams from the sim to the dashboard (per-axis charts +
+  brain-decision panel). Sufficient to drive Phase 2; richer obstacle/nav telemetry lands with
+  the Unity scene in Phase 7.*
 
-**Exit criteria:** one agent holds attitude and navigates a cluttered scene reliably at >50 Hz,
-reflex loop measured under 13 ms. *(Attitude-hold + budget proven in Rust; needs the Unity scene
-run to close P1.1/P1.3/P1.4.)*
+**Exit criteria (as achievable here):** the Rust reflex loop holds attitude on all three axes
+from a disturbed start, at 500 Hz, measured under 13 ms, with telemetry streaming — ✅ **met**.
+Navigation-in-clutter is validated in Phase 7 with the Unity plant.
 
 ---
 
-## Phase 2 — The Symbolic Brain + Verification Moat (Weeks 6–9)
-*Goal: the slow MeTTa brain supervises the fast loop — and verifies its own decisions. This is the defensibility.*
+## Phase 2 — The Symbolic Brain + Verification Moat (Weeks 6–9) — 🟡 ACTIVE
+*Goal: the slow MeTTa brain supervises the fast loop — and verifies its own decisions. This is the defensibility. **100% buildable here.***
 
-- 🔴 **P2.1** MeTTa knowledge base in `metta-logic/`: world facts, agent state, mission goals as Atoms.
-- 🔴 **P2.2** Slow supervisory loop: MeTTa reasons over telemetry → emits setpoints to the reflex
-  loop (NEVER inside the <13 ms path).
-- 🔴 **P2.3** ⚠️ **Verification loop** — the moat. Map the 5 agent-hallucination types
-  (Reasoning/Execution/Perception/Memorization/Communication) to symbolic checks that gate actions.
-  Output: `metta-logic/verification/` + doc mapping each type → check.
-- 🔴 **P2.4** Governance: persistent workspace + skills; agent refuses/flags low-confidence actions
+> **Runtime pattern (Rust-first, safety-critical in Rust).** The reasoning RULES live in `.metta`
+> files; **Rust orchestrates and gates** every decision via the existing `brain::SymbolicBrain`
+> seam (`SubprocessBrain` over a venv, `FakeBrain` for tests — ADR 0003). The MeTTa *engine* is
+> Python-bound (no linkable `libhyperon`), but the safety-critical action-gate stays in Rust.
+> Everything here runs and tests in this environment.
+
+> **Waterfall order (do these in sequence):** ① Verification moat → ② Supervisory loop →
+> ③ Partitioned Atomspace. Each stage lands green before the next starts.
+
+**Stage ① — Verification moat (the defensibility; build FIRST).**
+- 🔴 **P2.1** ⚠️ **Verification rules** — map the 5 agent-hallucination types
+  (Reasoning / Execution / Perception / Memorization / Communication) to symbolic checks in
+  `metta-logic/verification/*.metta`, one file per type. Each check takes a proposed action +
+  context and returns approve/reject with a reason.
+- 🔴 **P2.2** **Rust action-gate** — a `verify` seam in `nzi-core` that runs a proposed action
+  through the MeTTa checks (via `SymbolicBrain`) and only lets *approved* actions reach the
+  reflex/actuator layer. `FakeBrain`-backed unit tests + a venv-backed integration test.
+- 🔴 **P2.3** **Fault-injection tests** — feed the gate bad/contradictory/out-of-bounds actions
+  and confirm each hallucination type is caught, not acted on. Surface verdicts to the dashboard
+  (the `BrainDecision.verified` flag already exists on the wire).
+
+**Stage ② — Supervisory loop (wire brain → reflex).**
+- 🔴 **P2.4** MeTTa knowledge base in `metta-logic/`: world facts, agent state, mission goals as Atoms.
+- 🔴 **P2.5** Slow supervisory loop: MeTTa reasons over telemetry → emits **verified** setpoints to
+  the reflex loop (NEVER inside the <13 ms path; the gate from Stage ① sits in between).
+- 🔴 **P2.6** Governance: persistent workspace; agent refuses/flags low-confidence actions
   (kill knowledge-boundary overconfidence).
-- 🔴 **P2.5** Fault-injection tests: feed the agent bad/contradictory data, confirm verification catches it.
-- 🔴 **P2.6** ⚠️ **Implement ADR 0002 (partitioned Atomspace)** — small hot working-space per agent +
-  rule-driven inference over cold knowledge; re-benchmark to confirm query p99 no longer grows with
-  total knowledge size. *(Required because P0.3 found `space.query()` is O(n).)*
+
+**Stage ③ — Partitioned Atomspace (retire the O(n) risk).**
+- 🔴 **P2.7** ⚠️ **Implement ADR 0002** — small hot working-space per agent + rule-driven inference
+  over cold knowledge; re-benchmark to confirm query p99 no longer grows with total knowledge
+  size. *(Required because P0.3 found `space.query()` is O(n).)*
 
 **Exit criteria:** the agent explains and *symbolically justifies* every action; injected faults
-are caught by the verification layer, not acted on.
+are caught by the verification layer, not acted on; query p99 is flat vs. knowledge size.
 
 ---
 
@@ -87,8 +117,9 @@ are caught by the verification layer, not acted on.
 - 🔴 **P3.1** Weed/pest detection model (Python/ML) on simulated crop imagery.
 - 🔴 **P3.2** Sensor fusion (vision + context) feeding the MeTTa brain; symbolic rules decide
   "treat / don't treat" with justification.
-- 🔴 **P3.3** Synthetic-data pipeline in Unity to fight the robotics data-scarcity bottleneck
-  (generate long-tail cases).
+- ⏭️ **P3.3 → Phase 7** Synthetic-data pipeline in Unity to fight the robotics data-scarcity
+  bottleneck (generate long-tail cases). *Needs the Unity engine; the detection model + symbolic
+  treat/don't-treat logic (P3.1/P3.2/P3.4) can use public/recorded imagery here without it.*
 - 🔴 **P3.4** Metrics: detection precision/recall + simulated pesticide-reduction %.
 
 **Exit criteria:** one bot identifies weeds/pests in sim and makes verifiable treat decisions,
@@ -99,7 +130,12 @@ with a measured pesticide-reduction story.
 ## Phase 4 — From One to a Fleet: SoNS Swarm (Weeks 14–18)
 *Goal: scale to a swarm using self-organizing hierarchy — only after ONE bot is solid.*
 
-- 🔴 **P4.1** Multi-agent Unity scene; neighbor-local communication only.
+> The SoNS coordination LOGIC is buildable here as a headless multi-agent simulation in Rust
+> (N `AgentSim`s + neighbor-local message passing) — no Unity needed to prove self-organization.
+> Only the 3D visualization of the swarm is deferred.
+
+- 🔴 **P4.1** Headless multi-agent sim in Rust: N agents, neighbor-local communication only.
+  *(⏭️ the Unity 3D **visualization** of the scene → Phase 7; the coordination logic is here.)*
 - 🔴 **P4.2** Implement **SoNS** (Self-organizing Nervous System): runtime-formed hierarchy,
   transient interchangeable "brain" agent, reconfiguration on failure.
 - 🔴 **P4.3** Stigmergy / task-allocation for coordinating precision-ag coverage.
@@ -125,14 +161,31 @@ verified, not just emergent-and-hoped.
 
 ---
 
-## Phase 6 — Decentralization & Hardware Path (Weeks 24+)
-*Goal: real-world credibility.*
+## Phase 6 — Decentralization (Weeks 24+)
+*Goal: real-world credibility — **on-chain work stays here** (testnet is reachable now).*
 
-- 🔴 **P6.1** Robonomics integration: agent identity, signed telemetry, missions.
-- 🔴 **P6.2** WASM/embedded target for `rust-core` (⚠️ build from scratch — no Hyperon support today).
-- 🔴 **P6.3** ⚠️ Hardware spike: cheapest viable physical agent; confront the untethered-power problem
-  head-on (insect-scale power is unsolved — pick a realistic node size).
-- 🔴 **P6.4** Sim-to-real transfer trials.
+- 🔴 **P6.1** Robonomics integration: agent identity, signed telemetry, missions — on **testnet**.
+- 🔴 **P6.2** Deploy the ZK verifier on **Starknet testnet** (the local `zk-cairo` prove/verify
+  already works; testnet deploy is reachable from here, so it is NOT deferred).
+- 🔴 **P6.3** WASM target for `rust-core` (⚠️ build from scratch — no Hyperon support today). WASM
+  builds and runs in this environment, so it stays here; the *embedded/on-metal* target is P7.
+
+---
+
+## Phase 7 — External Runtimes (LAST — needs a tool outside this dev env)
+*Goal: everything that genuinely requires the **Unity engine** or **physical hardware**. Nothing
+here blocks the software story; each item has a scaffold or a headless equivalent built earlier.*
+
+- ⏭️ **P7.1** Build the Unity ML-Agents scenes from the `unity-sim/` scaffold and run the reflex
+  loop against real physics (closes **P1.1**).
+- ⏭️ **P7.2** Optic-flow obstacle avoidance + collision-tolerance in the 3D scene (closes **P1.3/P1.4**).
+- ⏭️ **P7.3** Unity synthetic-data pipeline for long-tail perception cases (closes **P3.3**).
+- ⏭️ **P7.4** Unity 3D visualization of the SoNS swarm (the logic is already headless in Phase 4).
+- ⏭️ **P7.5** ⚠️ Hardware spike: cheapest viable physical agent; confront untethered insect-scale
+  power head-on. **Embedded** target for `rust-core` (on-metal, beyond the WASM build in P6.3).
+- ⏭️ **P7.6** Sim-to-real transfer trials.
+
+**Exit criteria:** the proven-in-software system runs on a real 3D plant and a first physical node.
 
 ---
 
@@ -148,8 +201,9 @@ verified, not just emergent-and-hoped.
   capability (brain decisions, weather nowcasts, swarm view) into it as it lands.
 - **ZK verifiable decisions** — 🟢 foundation set: `zk-rust/` (arkworks Groth16, working
   prove/verify) + `zk-cairo/` (Starknet-native mirror). Per ADR 0004: build in Rust, settle
-  on-chain in Cairo later. Next statement: prove a decision came from the signed MeTTa ruleset;
-  eventually attach proofs to on-chain telemetry (ties into P6.1 Robonomics).
+  on-chain in Cairo later. On-chain settlement targets a **testnet** (reachable now — NOT deferred
+  to Phase 7). Next statement: prove a decision came from the signed MeTTa ruleset; then deploy the
+  verifier to Starknet testnet (P6.2) and attach proofs to on-chain telemetry (P6.1 Robonomics).
 - **TINA-X (flagship reasoning app)** — 🟢 core built: `tina-x/` independent component
   (ADR 0005). MeTTa dependency graph + cascading-failure rules + Python black-swan injector +
   optional Nzi-dashboard bridge (verified end-to-end). Next: OSM ingestion (real region),
@@ -162,8 +216,8 @@ verified, not just emergent-and-hoped.
 ## Open research risks to retire (tracked, not hidden)
 1. ⚠️ Hyperon is pre-alpha & unbenchmarked → **P0.3** retires this.
 2. ⚠️ Symbolic reasoning latency vs. reflex loop → **P0.3 + P2.2** validate the split.
-3. ⚠️ No Hyperon WASM/embedded/.NET path → **P6.2** builds it.
-4. ⚠️ Untethered power at insect scale is unsolved → **P6.3** picks a realistic scale.
+3. ⚠️ No Hyperon WASM/embedded/.NET path → **P6.3** builds the WASM target here; **P7.5** the embedded one.
+4. ⚠️ Untethered power at insect scale is unsolved → **P7.5** picks a realistic scale.
 5. ⚠️ 99% weather reliability is not real → **P5** targets calibrated skill instead.
 
 ---
