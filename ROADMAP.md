@@ -70,7 +70,7 @@ Navigation-in-clutter is validated in Phase 7 with the Unity plant.
 
 ---
 
-## Phase 2 — The Symbolic Brain + Verification Moat (Weeks 6–9) — 🟡 ACTIVE
+## Phase 2 — The Symbolic Brain + Verification Moat (Weeks 6–9) — 🟡 ACTIVE (Stage ① 🟢 done → Stage ② next)
 *Goal: the slow MeTTa brain supervises the fast loop — and verifies its own decisions. This is the defensibility. **100% buildable here.***
 
 > **Runtime pattern (Rust-first, safety-critical in Rust).** The reasoning RULES live in `.metta`
@@ -82,17 +82,22 @@ Navigation-in-clutter is validated in Phase 7 with the Unity plant.
 > **Waterfall order (do these in sequence):** ① Verification moat → ② Supervisory loop →
 > ③ Partitioned Atomspace. Each stage lands green before the next starts.
 
-**Stage ① — Verification moat (the defensibility; build FIRST).**
-- 🔴 **P2.1** ⚠️ **Verification rules** — map the 5 agent-hallucination types
-  (Reasoning / Execution / Perception / Memorization / Communication) to symbolic checks in
-  `metta-logic/verification/*.metta`, one file per type. Each check takes a proposed action +
-  context and returns approve/reject with a reason.
-- 🔴 **P2.2** **Rust action-gate** — a `verify` seam in `nzi-core` that runs a proposed action
-  through the MeTTa checks (via `SymbolicBrain`) and only lets *approved* actions reach the
-  reflex/actuator layer. `FakeBrain`-backed unit tests + a venv-backed integration test.
-- 🔴 **P2.3** **Fault-injection tests** — feed the gate bad/contradictory/out-of-bounds actions
-  and confirm each hallucination type is caught, not acted on. Surface verdicts to the dashboard
-  (the `BrainDecision.verified` flag already exists on the wire).
+**Stage ① — Verification moat (the defensibility; build FIRST). — 🟢 DONE**
+- 🟢 **P2.1** ⚠️ **Verification rules** — the 5 agent-hallucination types
+  (Reasoning / Execution / Perception / Memorization / Communication) are mapped to symbolic
+  checks in `metta-logic/verification/*.metta`, one file per type, plus `limits.metta` (shared
+  constants) and `verify.metta` (the `gate-setpoint` composer that returns
+  `Approved` / `(Rejected <check>)`). `python3 metta-logic/run_verify_smoke.py` is green (6/6:
+  one good action approved, one bad per type rejected with the right reason). *(done)*
+- 🟢 **P2.2** **Rust action-gate** — `nzi-core::verify` (`Gate<B: SymbolicBrain>`, `Setpoint`,
+  `Context`, `Verdict`) loads the `.metta` rules at runtime (single source of truth on disk),
+  builds `<rules>\n!(gate-setpoint …)`, runs it through the `SymbolicBrain` seam and parses the
+  verdict **fail-closed** (an unrecognized answer is never treated as approval). `FakeBrain`
+  unit tests + `cargo run -p nzi-core --bin verify-demo`. *(done)*
+- 🟢 **P2.3** **Fault-injection tests** — `rust-core/tests/verify_integration.rs` feeds the real
+  gate a bad action per type and asserts each hallucination type is caught, not acted on
+  (7 tests, venv-backed, skip-gracefully). `Verdict::is_approved()` maps directly onto the
+  `BrainDecision.verified` wire flag for dashboard surfacing (Stage ② wires the live stream). *(done)*
 
 **Stage ② — Supervisory loop (wire brain → reflex).**
 - 🔴 **P2.4** MeTTa knowledge base in `metta-logic/`: world facts, agent state, mission goals as Atoms.

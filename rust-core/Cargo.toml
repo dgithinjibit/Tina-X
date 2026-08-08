@@ -18,3 +18,7 @@ path = "src/bin/reflex_demo.rs"
 [[bin]]
 name = "brain-demo"
 path = "src/bin/brain_demo.rs"
+
+[[bin]]
+name = "verify-demo"
+path = "src/bin/verify_demo.rs"

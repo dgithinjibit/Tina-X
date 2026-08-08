@@ -17,6 +17,7 @@ pub mod reflex;
 pub mod roofline;
 pub mod telemetry;
 pub mod unity_bridge;
+pub mod verify;
 
 /// Hard latency budget for a single reflex step, in microseconds.
 ///
