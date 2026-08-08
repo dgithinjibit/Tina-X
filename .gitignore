@@ -1,0 +1,23 @@
+# Rust
+/target
+**/*.rs.bk
+Cargo.lock
+
+# Python
+__pycache__/
+*.py[cod]
+.venv/
+venv/
+
+# Unity (to be added in Phase 1)
+unity-sim/Library/
+unity-sim/Temp/
+unity-sim/Obj/
+unity-sim/Build/
+unity-sim/Logs/
+
+# OS / editor
+.DS_Store
+*.swp
+.idea/
+.vscode/

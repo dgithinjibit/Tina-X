@@ -1,0 +1,14 @@
+[package]
+name = "nzi-core"
+version = "0.0.1"
+description = "Project Nzi agent core: reflex loop, telemetry, MeTTa bridge (Phase 0 scaffold)"
+edition.workspace = true
+license.workspace = true
+authors.workspace = true
+
+[dependencies]
+anyhow.workspace = true
+
+[[bin]]
+name = "reflex-demo"
+path = "src/bin/reflex_demo.rs"

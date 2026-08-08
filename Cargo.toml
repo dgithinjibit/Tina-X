@@ -1,0 +1,17 @@
+# Project Nzi — Rust workspace root
+# Phase 0 scaffold. See ROADMAP.md.
+[workspace]
+resolver = "2"
+members = [
+    "rust-core",
+]
+
+[workspace.package]
+edition = "2021"
+license = "MIT"
+authors = ["Project Nzi contributors"]
+repository = "https://github.com/web4ke/Project-Nzi"
+
+[workspace.dependencies]
+# Shared deps pinned here so every crate agrees on versions.
+anyhow = "1"
