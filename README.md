@@ -104,23 +104,32 @@ project-nzi/
 ├── weather-prediction/     # Harsh-weather nowcasting edge case (cited)
 │
 ├── rust-core/              # agent core: reflex loop (fast) + MeTTa brain bridge (slow)
-│   └── src/reflex.rs, brain.rs   # + bins: reflex-demo, brain-demo; tests/ integration
+│   └── src/reflex.rs, brain.rs, roofline.rs, telemetry.rs   # + bins & integration tests
+├── rust-server/            # mission-control API (axum): serves telemetry + BOM to the frontend
+├── frontend/               # React + TypeScript landing / dashboard (Vite + Vitest)
 ├── metta-logic/            # symbolic layer: smoke test, benchmark, Rust bridge worker
 ├── unity-sim/              # (to be built, Phase 1) ML-Agents scenes, synthetic data
 ├── robonomics-integration/ # (to be built, Phase 6) identity, telemetry, missions
-└── docs/                   # ADRs (0001–0003), benchmarks, DEV_SETUP
+└── docs/                   # ADRs (0001–0003), benchmarks, scaling/, DEV_SETUP
 ```
 
 ---
 
 ## 🚀 Getting Started
 
-See **[`ROADMAP.md`](./ROADMAP.md)** for the phased plan. Phase 0 (this week) is:
+See **[`ROADMAP.md`](./ROADMAP.md)** for the phased plan and **[`docs/DEV_SETUP.md`](./docs/DEV_SETUP.md)**
+for exact commands. Quick taste:
 ```bash
-rustup default stable        # Rust toolchain
-python3 -m pip install hyperon   # MeTTa/Hyperon (pre-alpha)
-# then: benchmark MeTTa/MORK ourselves before any real-time lock-in (Phase 0 deliverable)
+rustup default stable                 # Rust toolchain
+cargo test                            # 31 Rust tests (core + server + bridge integration)
+cargo run -p nzi-server               # mission-control API on http://127.0.0.1:8080
+cd frontend && npm install && npm run dev   # live dashboard (landing + telemetry + BOM)
 ```
+
+### 🖥️ Mission control (for hackathon judges / YC)
+Because Nzi is an IoT project, the **[`frontend/`](./frontend/)** React app is a live,
+verifiable landing page: real reflex telemetry streamed from Rust, the two-rate-brain
+explanation, and the **bill of materials** for one agent. Start `nzi-server`, then the frontend.
 
 ---
 

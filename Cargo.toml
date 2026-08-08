@@ -4,6 +4,7 @@
 resolver = "2"
 members = [
     "rust-core",
+    "rust-server",
 ]
 
 [workspace.package]

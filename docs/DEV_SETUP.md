@@ -5,14 +5,30 @@ Everything below is runnable today. See `ROADMAP.md` for what comes next.
 ## Prerequisites
 - Rust stable (`rustup default stable`) — tested on 1.97
 - Python 3.12
+- Node.js + npm (for the frontend) — tested on Node 24 / npm 11
 
 ## Rust core (fast reflex loop + slow MeTTa brain bridge)
 ```bash
 cargo test  -p nzi-core                    # 10 tests (8 unit + 2 bridge integration)
 cargo run   -p nzi-core --bin reflex-demo  # reflex micro-benchmark vs the 13 ms fly budget
 cargo run   -p nzi-core --bin brain-demo   # Rust <-> MeTTa bridge (needs the venv below)
-cargo clippy -p nzi-core --all-targets     # lint
+cargo clippy --all-targets                 # lint (whole workspace, 0 warnings)
 ```
+
+## Mission-control API + frontend (the live demo for judges)
+```bash
+# Terminal 1 — the Rust API (telemetry + bill of materials):
+cargo run -p nzi-server                    # http://127.0.0.1:8080  (GET /api/health|bom|status, WS /ws)
+
+# Terminal 2 — the React + TypeScript dashboard:
+cd frontend
+npm install
+npm test        # 14 Vitest tests
+npm run dev     # live landing page; connects to the API above
+npm run build   # production build (type-check + bundle)
+```
+The page renders even without the server (shows "start the server" hints). Full workspace test
+count: **31 Rust + 14 frontend**.
 Expected: all tests pass; `reflex-demo` reports "OK ... within the fly budget and converges"
 (max step latency single-digit-to-tens of µs — ~900x under the 13 ms budget); `brain-demo`
 prints MeTTa results driven from Rust (`!(+ 1 2)` → `3`).

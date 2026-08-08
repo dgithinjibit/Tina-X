@@ -127,9 +127,14 @@ verified, not just emergent-and-hoped.
 
 ## Cross-cutting tracks (run continuously)
 - **Benchmarks** — keep `docs/benchmarks/` current; every real-time decision cites a number.
+- **Roofline/profiling** — 🟢 `rust-core/src/roofline.rs` + `docs/scaling/` (transferable ideas
+  from jax-ml/scaling-book: compute-bound vs memory-bound reasoning). Apply it to new hot paths.
 - **ADRs** — one architecture-decision record per major choice in `docs/adr/`.
 - **Research folders** — grow `fly-biomimicry/`, `limitations-edge-cases/`, `weather-prediction/`
   as we learn; they're living design docs.
+- **Mission-control demo** — 🟢 `rust-server/` (axum telemetry+BOM API) + `frontend/` (React/TS
+  landing & dashboard). Grows every phase; this is the live artifact judges/YC open. Wire each new
+  capability (brain decisions, weather nowcasts, swarm view) into it as it lands.
 - **YC readiness** — after Phase 3, we have a demoable wedge that maps to YC's named ag-robotics RFS.
 
 ---
