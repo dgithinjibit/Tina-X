@@ -107,6 +107,8 @@ project-nzi/
 │   └── src/reflex.rs, brain.rs, roofline.rs, telemetry.rs   # + bins & integration tests
 ├── rust-server/            # mission-control API (axum): serves telemetry + BOM to the frontend
 ├── frontend/               # React + TypeScript landing / dashboard (Vite + Vitest)
+├── zk-rust/                # ZK POC (arkworks Groth16): verifiable agent decisions
+├── zk-cairo/               # ZK POC (Cairo/Scarb): same rule, Starknet-native on-chain target
 ├── metta-logic/            # symbolic layer: smoke test, benchmark, Rust bridge worker
 ├── unity-sim/              # (to be built, Phase 1) ML-Agents scenes, synthetic data
 ├── robonomics-integration/ # (to be built, Phase 6) identity, telemetry, missions

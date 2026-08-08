@@ -135,6 +135,10 @@ verified, not just emergent-and-hoped.
 - **Mission-control demo** — 🟢 `rust-server/` (axum telemetry+BOM API) + `frontend/` (React/TS
   landing & dashboard). Grows every phase; this is the live artifact judges/YC open. Wire each new
   capability (brain decisions, weather nowcasts, swarm view) into it as it lands.
+- **ZK verifiable decisions** — 🟢 foundation set: `zk-rust/` (arkworks Groth16, working
+  prove/verify) + `zk-cairo/` (Starknet-native mirror). Per ADR 0004: build in Rust, settle
+  on-chain in Cairo later. Next statement: prove a decision came from the signed MeTTa ruleset;
+  eventually attach proofs to on-chain telemetry (ties into P6.1 Robonomics).
 - **YC readiness** — after Phase 3, we have a demoable wedge that maps to YC's named ag-robotics RFS.
 
 ---

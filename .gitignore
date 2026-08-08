@@ -3,6 +3,10 @@
 **/*.rs.bk
 Cargo.lock
 
+# Cairo / Scarb
+zk-cairo/target/
+**/.snfoundry_cache/
+
 # Python
 __pycache__/
 *.py[cod]

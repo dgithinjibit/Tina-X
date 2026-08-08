@@ -1,0 +1,19 @@
+[package]
+name = "nzi_zk_cairo"
+version = "0.0.1"
+edition = "2024_07"
+# Project Nzi ZK POC (Cairo): prove a safe-to-fly decision.
+#
+# Why Cairo counts as "ZK": Cairo is a provable language — any Cairo program you run on a STARK
+# prover (Starknet, or the `stwo`/`cairo-prove` tooling) yields a STARK proof that the program
+# executed correctly on its inputs. So writing the safe-to-fly RULE in Cairo and running it
+# *is* the computation we would prove. This POC nails down the LOGIC + tests; hooking it to an
+# actual prover / on-chain verifier is the follow-up decided in docs/adr/0004.
+
+[dependencies]
+
+[dev-dependencies]
+cairo_test = "2.9.2"
+
+[cairo]
+# Keep the POC simple: a plain Cairo library with unit tests (no Starknet contract target yet).

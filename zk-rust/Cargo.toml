@@ -1,0 +1,22 @@
+[package]
+name = "nzi-zk-rust"
+version = "0.0.1"
+description = "Project Nzi ZK POC (Rust-native, arkworks Groth16): prove a safe-to-fly decision"
+edition.workspace = true
+license.workspace = true
+authors.workspace = true
+
+[dependencies]
+# arkworks: a mature pure-Rust zk-SNARK toolkit.
+# - ark-bn254: the BN254 pairing-friendly curve (widely used, Ethereum-compatible).
+# - ark-groth16: the Groth16 proving system (tiny, fast-to-verify proofs).
+# - ark-relations / ark-r1cs-std: build the arithmetic circuit (R1CS constraints).
+ark-bn254 = "0.5"
+ark-groth16 = "0.5"
+ark-relations = "0.5"
+ark-r1cs-std = "0.5"
+ark-ff = "0.5"
+ark-std = "0.5"
+ark-snark = "0.5"
+ark-serialize = "0.5"
+rand = "0.8"
