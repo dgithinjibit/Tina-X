@@ -1,6 +1,6 @@
 // Pure telemetry helpers — no React, no DOM — so they are trivially unit-testable.
 
-import { REFLEX_BUDGET_US, type ReflexSample } from "./api";
+import { AXES, REFLEX_BUDGET_US, type AxisName, type ReflexSample } from "./api";
 
 /** Keep only the most recent `max` samples (a rolling window for the live chart). */
 export function pushWindow(
@@ -17,9 +17,65 @@ export function withinBudget(sample: ReflexSample): boolean {
   return sample.latency_us <= REFLEX_BUDGET_US;
 }
 
-/** Absolute tracking error for a sample (|setpoint - measured|). */
+/** Absolute tracking error for a sample (|setpoint - measured|).
+ *
+ * If the sample carries 3-axis detail, this is the WORST-axis error (matching the Rust sim's
+ * `last_error`); otherwise it falls back to the single scalar axis. */
 export function trackingError(sample: ReflexSample): number {
+  if (sample.attitude) {
+    const { setpoint, measured } = sample.attitude;
+    return Math.max(
+      Math.abs(setpoint.roll - measured.roll),
+      Math.abs(setpoint.pitch - measured.pitch),
+      Math.abs(setpoint.yaw - measured.yaw),
+    );
+  }
   return Math.abs(sample.setpoint - sample.measured);
+}
+
+/** Does this sample carry the richer 3-axis attitude detail? */
+export function hasAttitude(sample: ReflexSample): boolean {
+  return sample.attitude !== undefined;
+}
+
+/** One axis's setpoint/measured/command for a sample. Falls back to the scalar (roll) fields
+ * when no 3-axis detail is present, so callers can treat every sample uniformly. */
+export function axisValues(
+  sample: ReflexSample,
+  axis: AxisName,
+): { setpoint: number; measured: number; command: number } {
+  if (sample.attitude) {
+    return {
+      setpoint: sample.attitude.setpoint[axis],
+      measured: sample.attitude.measured[axis],
+      command: sample.attitude.command[axis],
+    };
+  }
+  // No 3-axis detail: only the primary (roll) axis is meaningful; others read as flat zero.
+  if (axis === "roll") {
+    return { setpoint: sample.setpoint, measured: sample.measured, command: sample.command };
+  }
+  return { setpoint: 0, measured: 0, command: 0 };
+}
+
+/** Extract the measured-vs-setpoint series for one axis across a window, for charting. */
+export function axisSeries(
+  buffer: ReflexSample[],
+  axis: AxisName,
+): { measured: number[]; setpoint: number[] } {
+  const measured: number[] = [];
+  const setpoint: number[] = [];
+  for (const s of buffer) {
+    const v = axisValues(s, axis);
+    measured.push(v.measured);
+    setpoint.push(v.setpoint);
+  }
+  return { measured, setpoint };
+}
+
+/** The list of axes actually present in a sample: all three if 3-axis, else just roll. */
+export function axesPresent(sample: ReflexSample | undefined): readonly AxisName[] {
+  return sample?.attitude ? AXES : (["roll"] as const);
 }
 
 /** Simple stats over a window, for the dashboard header. */

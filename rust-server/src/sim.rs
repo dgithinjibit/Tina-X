@@ -8,17 +8,24 @@
 //! This is pure logic (no async, no HTTP) so it is easy to unit-test. The server layer just
 //! calls [`AgentSim::tick`] on a timer and forwards the samples.
 
-use nzi_core::reflex::{PdGains, ReflexStabilizer};
-use nzi_core::telemetry::{AgentStatus, ReflexSample};
+use nzi_core::reflex::{AttitudeStabilizer, Vec3};
+use nzi_core::telemetry::{AgentStatus, Axis3, AttitudeSample, ReflexSample};
 use nzi_core::REFLEX_BUDGET_US;
 use std::time::Instant;
 
-/// One simulated Nzi agent: a reflex stabilizer + a toy rate-integrator plant.
+/// Convert a control-layer `Vec3` into the telemetry-layer `Axis3` (wire type).
+fn to_axis3(v: Vec3) -> Axis3 {
+    Axis3 { roll: v.roll, pitch: v.pitch, yaw: v.yaw }
+}
+
+/// One simulated Nzi agent: a 3-axis attitude stabilizer + a toy per-axis rate-integrator plant.
 pub struct AgentSim {
     agent_id: String,
-    stab: ReflexStabilizer,
-    setpoint: f32,
-    measured: f32,
+    stab: AttitudeStabilizer,
+    /// Per-axis target body rates the "slow brain" wants held.
+    setpoint: Vec3,
+    /// Per-axis measured body rates (evolves via the toy plant).
+    measured: Vec3,
     dt: f32,
     step: u64,
     last_latency_us: u32,
@@ -30,9 +37,11 @@ impl AgentSim {
     pub fn new(agent_id: impl Into<String>, dt: f32) -> Self {
         Self {
             agent_id: agent_id.into(),
-            stab: ReflexStabilizer::new(PdGains::default()),
-            setpoint: 1.0,
-            measured: 0.0,
+            stab: AttitudeStabilizer::default(),
+            // Distinct per-axis targets so the dashboard shows three genuinely independent
+            // traces (roll climbs to +1, pitch to -0.5, yaw to +0.25) rather than three copies.
+            setpoint: Vec3::new(1.0, -0.5, 0.25),
+            measured: Vec3::ZERO,
             dt,
             step: 0,
             last_latency_us: 0,
@@ -40,8 +49,8 @@ impl AgentSim {
         }
     }
 
-    /// Change the target rate the agent is trying to hold (the "slow brain" would set this).
-    pub fn set_setpoint(&mut self, setpoint: f32) {
+    /// Change the target body rates the agent is trying to hold (the "slow brain" would set this).
+    pub fn set_setpoint(&mut self, setpoint: Vec3) {
         self.setpoint = setpoint;
     }
 
@@ -54,19 +63,34 @@ impl AgentSim {
         let command = self.stab.step(self.setpoint, self.measured, self.dt);
         let latency_us = t0.elapsed().as_micros() as u32;
 
-        // Integrate the toy rate-integrator plant OUTSIDE the timed region (matches nzi-core).
-        self.measured += command * self.dt;
+        // Integrate the toy per-axis rate-integrator plant OUTSIDE the timed region: for a rate
+        // stabilizer the command IS angular acceleration, so measured_rate += cmd * dt per axis.
+        self.measured.roll += command.roll * self.dt;
+        self.measured.pitch += command.pitch * self.dt;
+        self.measured.yaw += command.yaw * self.dt;
 
         self.step += 1;
         self.last_latency_us = latency_us;
-        self.last_error = (self.setpoint - self.measured).abs();
+        // Worst-axis error — the single "how far off is the agent?" scalar the status uses.
+        self.last_error = Vec3::new(
+            self.setpoint.roll - self.measured.roll,
+            self.setpoint.pitch - self.measured.pitch,
+            self.setpoint.yaw - self.measured.yaw,
+        )
+        .max_abs();
 
         ReflexSample {
             step: self.step,
-            setpoint: self.setpoint,
-            measured: self.measured,
-            command,
+            // Primary axis (roll) fills the legacy scalar fields for backward compatibility.
+            setpoint: self.setpoint.roll,
+            measured: self.measured.roll,
+            command: command.roll,
             latency_us,
+            attitude: Some(AttitudeSample {
+                setpoint: to_axis3(self.setpoint),
+                measured: to_axis3(self.measured),
+                command: to_axis3(command),
+            }),
         }
     }
 
@@ -98,21 +122,33 @@ mod tests {
     }
 
     #[test]
-    fn sim_converges_toward_setpoint() {
+    fn tick_emits_three_axis_attitude() {
+        // The richer telemetry must be present, and its roll axis must equal the legacy scalars.
+        let mut sim = AgentSim::new("nzi-001", 1.0 / 500.0);
+        let s = sim.tick();
+        let att = s.attitude.expect("attitude should be populated by the multi-axis sim");
+        assert_eq!(att.setpoint.roll, s.setpoint);
+        assert_eq!(att.measured.roll, s.measured);
+        assert_eq!(att.command.roll, s.command);
+    }
+
+    #[test]
+    fn sim_converges_on_all_axes() {
         let mut sim = AgentSim::new("nzi-001", 1.0 / 500.0);
         for _ in 0..5000 {
             sim.tick();
         }
-        // After enough steps the measured rate should track the setpoint closely.
-        assert!(sim.last_error < 0.05, "did not converge: err={}", sim.last_error);
+        // last_error is the WORST-axis error, so this asserts every axis converged.
+        assert!(sim.last_error < 0.05, "did not converge: worst-axis err={}", sim.last_error);
         assert!(sim.status().healthy);
     }
 
     #[test]
     fn changing_setpoint_is_reflected() {
         let mut sim = AgentSim::new("nzi-001", 1.0 / 500.0);
-        sim.set_setpoint(2.0);
+        sim.set_setpoint(Vec3::new(2.0, 0.0, 0.0));
         let s = sim.tick();
-        assert_eq!(s.setpoint, 2.0);
+        assert_eq!(s.setpoint, 2.0); // roll axis surfaces in the legacy scalar
+        assert_eq!(s.attitude.unwrap().setpoint.roll, 2.0);
     }
 }

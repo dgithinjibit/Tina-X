@@ -120,7 +120,7 @@ project-nzi/
 ├── zk-cairo/               # ZK POC (Cairo/Scarb): same rule, Starknet-native on-chain target
 ├── tina-x/                 # 🌍 TINA-X: symbolic cascading-failure reasoner (INDEPENDENT component)
 ├── metta-logic/            # symbolic layer: smoke test, benchmark, Rust bridge worker
-├── unity-sim/              # (to be built, Phase 1) ML-Agents scenes, synthetic data
+├── unity-sim/              # Phase 1 sim SCAFFOLD (C# ML-Agents + Rust bridge contract; build in Unity)
 ├── robonomics-integration/ # (to be built, Phase 6) identity, telemetry, missions
 └── docs/                   # ADRs (0001–0003), benchmarks, scaling/, DEV_SETUP
 ```
@@ -133,7 +133,7 @@ See **[`ROADMAP.md`](./ROADMAP.md)** for the phased plan and **[`docs/DEV_SETUP.
 for exact commands. Quick taste:
 ```bash
 rustup default stable                 # Rust toolchain
-cargo test                            # 31 Rust tests (core + server + bridge integration)
+cargo test                            # 48 Rust tests (core + server + ZK + bridge integration)
 cargo run -p nzi-server               # mission-control API on http://127.0.0.1:8080
 cd frontend && npm install && npm run dev   # live dashboard (landing + telemetry + BOM)
 ```

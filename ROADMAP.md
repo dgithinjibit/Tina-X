@@ -36,16 +36,27 @@ loop validated (~900× under budget) ✅; **Rust drives MeTTa end-to-end** ✅ (
 ## Phase 1 — One Simulated Bot: the Reflex Loop (Weeks 3–5)
 *Goal: a single agent that flies/moves stably in simulation. No intelligence yet — just the fly's spine.*
 
-- 🔴 **P1.1** Unity ML-Agents scene: one agent, physics, a few obstacles.
-- 🔴 **P1.2** Rust reflex loop: **delayed-PD stabilizer** driven by simulated rate gyros,
-  budgeted **<13 ms** (fly halteres spec). Runs as a fixed-rate control loop (>50 Hz).
+> **Split for this environment:** Unity/C# can't compile in the authoring container, so the
+> control side (fully testable here) is built and green in Rust, and the Unity side is written
+> as *scaffold* to open locally. Everything verifiable lives on the Rust side.
+
+- 🟡 **P1.1** Unity ML-Agents scene: one agent, physics, a few obstacles.
+  *Scaffolded in `unity-sim/` (C# `NziAgent`/`ReflexBridgeClient` + `SCENE_SETUP.md`); build in
+  the editor locally. Not compiled here — Rust owns the control loop.*
+- 🟢 **P1.2** Rust reflex loop: **3-axis delayed-PD stabilizer** (`reflex::AttitudeStabilizer`,
+  roll/pitch/yaw) driven by simulated rate gyros, budgeted **<13 ms** (fly halteres spec), running
+  at 500 Hz. Unity↔Rust bridge contract (`unity_bridge.rs` + `unity-sim/BRIDGE_CONTRACT.md`) is
+  defined and unit-tested end-to-end (reading → stabilizer → command converges on all axes). *(done)*
 - 🔴 **P1.3** Optic-flow-style obstacle avoidance (start crude — inter-sensor flow difference).
 - 🔴 **P1.4** Collision *tolerance*: verify the agent recovers from bumps (crash-and-recover),
   don't over-engineer avoidance.
-- 🔴 **P1.5** Telemetry stream out of the agent (feeds the symbolic brain in Phase 2).
+- 🟡 **P1.5** Telemetry stream out of the agent (feeds the symbolic brain in Phase 2).
+  *3-axis telemetry (`AttitudeSample`) now streams from the sim to the dashboard (per-axis
+  charts + brain-decision panel). Real obstacle/nav telemetry follows in P1.3.*
 
 **Exit criteria:** one agent holds attitude and navigates a cluttered scene reliably at >50 Hz,
-reflex loop measured under 13 ms.
+reflex loop measured under 13 ms. *(Attitude-hold + budget proven in Rust; needs the Unity scene
+run to close P1.1/P1.3/P1.4.)*
 
 ---
 

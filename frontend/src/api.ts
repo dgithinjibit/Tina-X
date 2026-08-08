@@ -15,13 +15,35 @@ export function wsUrl(base: string = API_BASE): string {
   return base.replace(/^http/, "ws") + "/ws";
 }
 
-/** One reflex-loop sample (mirror of Rust `ReflexSample`). */
+/** A roll/pitch/yaw triple (mirror of Rust `Axis3`). */
+export interface Axis3 {
+  roll: number;
+  pitch: number;
+  yaw: number;
+}
+
+/** Per-axis setpoint/measured/command for one step (mirror of Rust `AttitudeSample`). */
+export interface AttitudeSample {
+  setpoint: Axis3;
+  measured: Axis3;
+  command: Axis3;
+}
+
+/** The three body axes, in a fixed order for iterating/rendering. */
+export const AXES = ["roll", "pitch", "yaw"] as const;
+export type AxisName = (typeof AXES)[number];
+
+/** One reflex-loop sample (mirror of Rust `ReflexSample`).
+ *
+ * `attitude` is OPTIONAL: single-axis runs omit it (the scalar fields are the roll axis),
+ * multi-axis runs include the full 3-axis detail. Matches the serde `skip_serializing_if`. */
 export interface ReflexSample {
   step: number;
   setpoint: number;
   measured: number;
   command: number;
   latency_us: number;
+  attitude?: AttitudeSample;
 }
 
 /** A WebSocket telemetry message (mirror of Rust tagged enum `TelemetryMsg`). */

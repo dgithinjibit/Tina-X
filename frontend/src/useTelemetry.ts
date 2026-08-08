@@ -10,8 +10,18 @@ import { pushWindow } from "./telemetry";
 
 export type ConnState = "connecting" | "open" | "closed";
 
+/** A brain decision as carried on the wire (the tag stripped off). */
+export interface BrainDecision {
+  id: number;
+  query: string;
+  results: string[];
+  verified: boolean;
+}
+
 export function useTelemetry(windowSize = 120) {
   const [samples, setSamples] = useState<ReflexSample[]>([]);
+  // The most recent slow-brain decisions (newest first), for the decision panel.
+  const [decisions, setDecisions] = useState<BrainDecision[]>([]);
   const [conn, setConn] = useState<ConnState>("connecting");
   // Keep the socket in a ref so re-renders don't reopen it.
   const socketRef = useRef<WebSocket | null>(null);
@@ -34,6 +44,10 @@ export function useTelemetry(windowSize = 120) {
             // Strip the tag so we store a clean ReflexSample.
             const { type: _t, ...sample } = msg;
             setSamples((prev) => pushWindow(prev, sample as ReflexSample, windowSize));
+          } else if (msg.type === "decision") {
+            // Keep the newest few decisions (newest first); the slow brain is low-rate.
+            const { type: _t, ...decision } = msg;
+            setDecisions((prev) => [decision as BrainDecision, ...prev].slice(0, 8));
           }
         } catch {
           // Ignore malformed frames rather than crashing the UI.
@@ -58,5 +72,5 @@ export function useTelemetry(windowSize = 120) {
     };
   }, [windowSize]);
 
-  return { samples, conn };
+  return { samples, decisions, conn };
 }

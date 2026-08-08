@@ -3,10 +3,15 @@
 // For a junior dev: we draw two polylines (setpoint vs measured) by mapping each sample to an
 // (x, y) pixel. No chart library — keeps the bundle tiny and the logic inspectable.
 
-import type { ReflexSample } from "../api";
+import type { AxisName, ReflexSample } from "../api";
+import { axisSeries } from "../telemetry";
 
 interface Props {
   samples: ReflexSample[];
+  /** Which body axis to plot. Defaults to "roll" (the primary/legacy scalar axis). */
+  axis?: AxisName;
+  /** Color of the measured line — lets the caller color-code the three axes. */
+  measuredColor?: string;
   width?: number;
   height?: number;
 }
@@ -26,9 +31,15 @@ function toPolyline(values: number[], width: number, height: number, min: number
     .join(" ");
 }
 
-export function ReflexChart({ samples, width = 480, height = 140 }: Props) {
-  const setpoints = samples.map((s) => s.setpoint);
-  const measured = samples.map((s) => s.measured);
+export function ReflexChart({
+  samples,
+  axis = "roll",
+  measuredColor = "#4ade80",
+  width = 480,
+  height = 140,
+}: Props) {
+  // Pull the chosen axis's series (falls back to the scalar/roll fields for single-axis data).
+  const { measured, setpoint: setpoints } = axisSeries(samples, axis);
 
   // Shared vertical scale across both lines so they're comparable.
   const all = [...setpoints, ...measured];
@@ -38,7 +49,7 @@ export function ReflexChart({ samples, width = 480, height = 140 }: Props) {
   return (
     <svg
       role="img"
-      aria-label="Reflex loop: setpoint vs measured"
+      aria-label={`Reflex loop (${axis}): setpoint vs measured`}
       width={width}
       height={height}
       style={{ background: "#0b1020", borderRadius: 8, border: "1px solid #23304d" }}
@@ -47,7 +58,7 @@ export function ReflexChart({ samples, width = 480, height = 140 }: Props) {
       <polyline
         data-testid="measured-line"
         fill="none"
-        stroke="#4ade80"
+        stroke={measuredColor}
         strokeWidth={2}
         points={toPolyline(measured, width, height, min, max)}
       />

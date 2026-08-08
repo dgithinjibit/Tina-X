@@ -2,3 +2,5 @@ node_modules/
 dist/
 *.local
 .vite/
+# TypeScript incremental-build cache — a machine-local artifact, not source.
+*.tsbuildinfo

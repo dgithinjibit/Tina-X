@@ -1,1 +1,0 @@
-{"root":["./src/App.tsx","./src/api.test.ts","./src/api.ts","./src/main.tsx","./src/telemetry.test.ts","./src/telemetry.ts","./src/useTelemetry.ts","./src/components/BomTable.test.tsx","./src/components/BomTable.tsx","./src/components/ReflexChart.tsx","./src/test/setup.ts"],"version":"5.9.3"}

@@ -10,14 +10,22 @@
 // renders (landing + how-it-works) and shows friendly "start the server" hints.
 
 import { useEffect, useState } from "react";
-import { fetchBom, type Bom } from "./api";
-import { computeStats } from "./telemetry";
+import { fetchBom, type AxisName, type Bom } from "./api";
+import { axesPresent, computeStats } from "./telemetry";
 import { useTelemetry } from "./useTelemetry";
 import { ReflexChart } from "./components/ReflexChart";
+import { BrainDecisionPanel } from "./components/BrainDecisionPanel";
 import { BomTable } from "./components/BomTable";
 
+// Color per body axis so the three traces are easy to tell apart at a glance.
+const AXIS_COLORS: Record<AxisName, string> = {
+  roll: "#4ade80",
+  pitch: "#fbbf24",
+  yaw: "#c084fc",
+};
+
 export function App() {
-  const { samples, conn } = useTelemetry();
+  const { samples, decisions, conn } = useTelemetry();
   const [bom, setBom] = useState<Bom | null>(null);
   const [bomError, setBomError] = useState<string | null>(null);
 
@@ -29,6 +37,8 @@ export function App() {
 
   const stats = computeStats(samples);
   const budgetOk = stats.allWithinBudget;
+  // Which axes to chart: all three when the sim streams 3-axis data, else just roll.
+  const axes = axesPresent(samples[samples.length - 1]);
 
   return (
     <main style={styles.page}>
@@ -55,8 +65,8 @@ export function App() {
         <h2 style={styles.h2}>Live reflex telemetry</h2>
         <p style={styles.muted}>
           A real control loop (the same code that would fly the robot) running on the Rust server,
-          streamed here. Green = measured rate, blue dashed = target. The fly stabilizes in ~13 ms;
-          our loop runs far under that.
+          streamed here. Each chart is one body axis — colored line = measured rate, blue dashed =
+          target. The fly stabilizes in ~13 ms; our loop runs far under that.
         </p>
 
         <div style={styles.statsRow}>
@@ -68,13 +78,39 @@ export function App() {
           <Stat label="Within 13 ms budget" value={budgetOk ? "yes" : "NO"} good={budgetOk} />
         </div>
 
-        <ReflexChart samples={samples} />
+        <div style={styles.axisGrid}>
+          {axes.map((axis) => (
+            <figure key={axis} style={styles.axisFigure}>
+              <figcaption style={styles.axisCaption}>
+                <span style={{ color: AXIS_COLORS[axis] }}>●</span> {axis}
+              </figcaption>
+              <ReflexChart
+                samples={samples}
+                axis={axis}
+                measuredColor={AXIS_COLORS[axis]}
+                width={280}
+                height={120}
+              />
+            </figure>
+          ))}
+        </div>
 
         {conn !== "open" && (
           <p style={styles.hint}>
             No live data yet. Start the API server: <code>cargo run -p nzi-server</code>
           </p>
         )}
+      </section>
+
+      {/* 2b. SLOW BRAIN ----------------------------------------------------------- */}
+      <section style={styles.section}>
+        <h2 style={styles.h2}>Slow symbolic brain — verified decisions</h2>
+        <p style={styles.muted}>
+          The MeTTa brain&apos;s recent decisions, each with the query it ran and whether the
+          verification layer approved it. This is the &quot;verifiability moat&quot;: judges can see
+          the agent <em>reason</em>, not just act.
+        </p>
+        <BrainDecisionPanel decisions={decisions} />
       </section>
 
       {/* 3. HOW IT WORKS ---------------------------------------------------------- */}
@@ -153,6 +189,9 @@ const styles: Record<string, React.CSSProperties> = {
   muted: { color: "#9fb3d1", lineHeight: 1.5 },
   hint: { color: "#fbbf24", marginTop: 8 },
   statsRow: { display: "flex", gap: 10, flexWrap: "wrap", margin: "12px 0" },
+  axisGrid: { display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(280px, 1fr))", gap: 12 },
+  axisFigure: { margin: 0 },
+  axisCaption: { textTransform: "capitalize", color: "#c3d0e6", fontWeight: 600, marginBottom: 4 },
   stat: { background: "#0b1020", border: "1px solid #23304d", borderRadius: 8, padding: "8px 12px", minWidth: 110 },
   statLabel: { fontSize: "0.75rem", color: "#6b7fa3" },
   statValue: { fontSize: "1.1rem", fontWeight: 700 },
