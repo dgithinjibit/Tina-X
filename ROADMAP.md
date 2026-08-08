@@ -70,7 +70,7 @@ Navigation-in-clutter is validated in Phase 7 with the Unity plant.
 
 ---
 
-## Phase 2 — The Symbolic Brain + Verification Moat (Weeks 6–9) — 🟡 ACTIVE (Stages ①② 🟢 done → Stage ③ next)
+## Phase 2 — The Symbolic Brain + Verification Moat (Weeks 6–9) — 🟢 DONE (all three stages)
 *Goal: the slow MeTTa brain supervises the fast loop — and verifies its own decisions. This is the defensibility. **100% buildable here.***
 
 > **Runtime pattern (Rust-first, safety-critical in Rust).** The reasoning RULES live in `.metta`
@@ -114,10 +114,13 @@ Navigation-in-clutter is validated in Phase 7 with the Unity plant.
   (empty/unparseable/errored proposal). Doubt is never treated as approval. Proven by the
   stale-telemetry integration test (refused → last-safe held). *(done)*
 
-**Stage ③ — Partitioned Atomspace (retire the O(n) risk).**
-- 🔴 **P2.7** ⚠️ **Implement ADR 0002** — small hot working-space per agent + rule-driven inference
-  over cold knowledge; re-benchmark to confirm query p99 no longer grows with total knowledge
-  size. *(Required because P0.3 found `space.query()` is O(n).)*
+**Stage ③ — Partitioned Atomspace (retire the O(n) risk). — 🟢 DONE**
+- 🟢 **P2.7** ✅ **ADR 0002 implemented + re-benchmarked.** A separate tiny hot space is queried
+  instead of scanning a big flat space; cold knowledge is reached by keyed rules
+  (`metta-logic/knowledge/partition.metta`). `metta-logic/bench_partition.py` proves it: hot-space
+  query p99 **0.9 ms → 0.6 ms** across 1k→100k total knowledge (**0.7×, flat**) while flat
+  `query()` grew **92.6×**. The bound that keeps it flat is enforced in Rust by
+  `atomspace::HotWorkingSpace::MAX_FACTS`. Open-risk #2 retired for the common case. *(done)*
 
 **Exit criteria:** the agent explains and *symbolically justifies* every action; injected faults
 are caught by the verification layer, not acted on; query p99 is flat vs. knowledge size.
@@ -228,7 +231,8 @@ here blocks the software story; each item has a scaffold or a headless equivalen
 
 ## Open research risks to retire (tracked, not hidden)
 1. ⚠️ Hyperon is pre-alpha & unbenchmarked → **P0.3** retires this.
-2. ⚠️ Symbolic reasoning latency vs. reflex loop → **P0.3 + P2.2** validate the split.
+2. ⚠️ Symbolic reasoning latency vs. reflex loop → **P0.3 + P2.2** validate the split; 🟢 **P2.7
+   retired the O(n) `query()` risk** (partitioned hot space, p99 flat vs. knowledge size).
 3. ⚠️ No Hyperon WASM/embedded/.NET path → **P6.3** builds the WASM target here; **P7.5** the embedded one.
 4. ⚠️ Untethered power at insect scale is unsolved → **P7.5** picks a realistic scale.
 5. ⚠️ 99% weather reliability is not real → **P5** targets calibrated skill instead.

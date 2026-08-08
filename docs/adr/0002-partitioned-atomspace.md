@@ -41,3 +41,8 @@ naively store all agent/world facts in one space and pattern-query it.
 ## Validation
 - Re-run the P0.3 query sweep after prototyping partitioned/indexed spaces; the goal is query
   p99 that does NOT grow with total-knowledge size.
+- **DONE (P2.7, 2026-08-08).** `metta-logic/bench_partition.py` compares a flat `query()` against a
+  separate tiny hot-space `query()` at equal total knowledge. Result: hot-space p99 stayed
+  **0.9 ms → 0.6 ms** across 1k → 100k (0.7×, flat) while flat `query()` grew **92.6×**. Goal met:
+  partitioned query p99 is size-independent. The bound is enforced in Rust by
+  `atomspace::HotWorkingSpace::MAX_FACTS`. Full numbers in `docs/benchmarks/metta-baseline.md`.

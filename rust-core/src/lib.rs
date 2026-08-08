@@ -12,6 +12,7 @@
 //!
 //! So the reflex loop here is a delayed-PD stabilizer with a hard latency budget.
 
+pub mod atomspace;
 pub mod brain;
 pub mod reflex;
 pub mod roofline;

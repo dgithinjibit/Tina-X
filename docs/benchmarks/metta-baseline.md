@@ -66,10 +66,27 @@ Bulk `add_atom` load time: 1k = 0.05s, 100k = 4.1s, 1M = 37.8s.
    10 ms) is ~78% of the 13 ms reflex budget; the worst (query @1M, 33 s) is 2,500× over it.
    Symbolic reasoning stays in the SLOW loop, full stop.
 
+## P2.7 — the O(n) fix, measured (`bench_partition.py`, hyperon 0.2.10)
+The ADR 0002 fix, validated: keep a **separate tiny hot space** and query it instead of scanning a
+big flat space. Same total knowledge loaded in both cases; the partitioned path queries only the
+hot space.
+
+| total knowledge | FLAT `query()` p99 | PARTITIONED hot-space `query()` p99 |
+|---|---|---|
+| 1,000 | 107 ms | 0.91 ms |
+| 100,000 | 9,936 ms | 0.61 ms |
+| **growth (1k→100k)** | **92.6×** | **0.7× (flat)** |
+
+**Conclusion:** the hot-space query is sub-millisecond and does NOT grow with total-knowledge size,
+while flat `query()` grows ~O(n) as before. This retires open-risk #2 for the common case. (1M flat
+point omitted — ~23 s/query, and the trend is already unambiguous.) The bound that keeps it flat is
+enforced in Rust by `atomspace::HotWorkingSpace::MAX_FACTS`. NOTE: building ~100k keyed rules in one
+`m.run()` panics hyperon's trie index (pre-alpha bug); load large tables as facts, not one program.
+
 ## TODO (remaining, tracked)
 - [x] Separate parse vs. evaluate time.
 - [x] Sweep Atomspace sizes 1e3 / 1e5 / 1e6.
-- [ ] Fix the O(n) query problem: prototype indexed/partitioned Atomspaces; re-benchmark.
+- [x] Fix the O(n) query problem: partitioned hot/cold spaces; re-benchmarked (P2.7, above).
 - [ ] Benchmark a realistic multi-step / backward-chaining query (not just a lookup).
 - [ ] Evaluate MORK path when accessible (verify the "orders of magnitude" claim ourselves).
 - [ ] Measure the Rust `libhyperon` crate path latency vs. the Python path.
