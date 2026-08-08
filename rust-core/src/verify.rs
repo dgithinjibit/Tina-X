@@ -95,7 +95,10 @@ pub struct Context {
 impl Context {
     /// Render as the MeTTa `(context ...)` term. Field order must match the `.metta` accessors,
     /// which destructure positionally: `(context $measured $fresh $finite $source $mode)`.
-    fn to_metta(&self) -> String {
+    ///
+    /// Crate-visible so the supervisory-loop tests can build the exact gate query the gate emits
+    /// internally (they program a `FakeBrain` that matches on that text).
+    pub(crate) fn to_metta(&self) -> String {
         format!(
             "(context (measured (rates {} {} {})) {} {} {} {})",
             fmt_num(self.measured.roll),

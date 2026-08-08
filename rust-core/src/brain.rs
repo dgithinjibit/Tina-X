@@ -96,7 +96,7 @@ impl std::error::Error for BrainError {}
 /// brain, so those tests don't need MeTTa installed and run in microseconds.
 ///
 /// It matches on the exact query text; unknown queries return an empty result list.
-#[derive(Default)]
+#[derive(Default, Clone)]
 pub struct FakeBrain {
     /// (query text) -> (results to return). A plain Vec keeps it dependency-free and obvious.
     canned: Vec<(String, Vec<String>)>,
@@ -134,6 +134,7 @@ impl SymbolicBrain for FakeBrain {
 ///
 /// See `docs/adr/0003-rust-metta-bridge.md` for why we use a subprocess instead of linking
 /// MeTTa directly. This is fine because the brain is a SLOW-loop component.
+#[derive(Clone)]
 pub struct SubprocessBrain {
     /// Path to the Python interpreter (typically the project venv: `.venv/bin/python`).
     python: PathBuf,

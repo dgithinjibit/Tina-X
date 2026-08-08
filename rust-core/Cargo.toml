@@ -22,3 +22,7 @@ path = "src/bin/brain_demo.rs"
 [[bin]]
 name = "verify-demo"
 path = "src/bin/verify_demo.rs"
+
+[[bin]]
+name = "supervise-demo"
+path = "src/bin/supervise_demo.rs"

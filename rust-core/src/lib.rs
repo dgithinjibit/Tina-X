@@ -15,6 +15,7 @@
 pub mod brain;
 pub mod reflex;
 pub mod roofline;
+pub mod supervise;
 pub mod telemetry;
 pub mod unity_bridge;
 pub mod verify;

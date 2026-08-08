@@ -70,7 +70,7 @@ Navigation-in-clutter is validated in Phase 7 with the Unity plant.
 
 ---
 
-## Phase 2 — The Symbolic Brain + Verification Moat (Weeks 6–9) — 🟡 ACTIVE (Stage ① 🟢 done → Stage ② next)
+## Phase 2 — The Symbolic Brain + Verification Moat (Weeks 6–9) — 🟡 ACTIVE (Stages ①② 🟢 done → Stage ③ next)
 *Goal: the slow MeTTa brain supervises the fast loop — and verifies its own decisions. This is the defensibility. **100% buildable here.***
 
 > **Runtime pattern (Rust-first, safety-critical in Rust).** The reasoning RULES live in `.metta`
@@ -99,12 +99,20 @@ Navigation-in-clutter is validated in Phase 7 with the Unity plant.
   (7 tests, venv-backed, skip-gracefully). `Verdict::is_approved()` maps directly onto the
   `BrainDecision.verified` wire flag for dashboard surfacing (Stage ② wires the live stream). *(done)*
 
-**Stage ② — Supervisory loop (wire brain → reflex).**
-- 🔴 **P2.4** MeTTa knowledge base in `metta-logic/`: world facts, agent state, mission goals as Atoms.
-- 🔴 **P2.5** Slow supervisory loop: MeTTa reasons over telemetry → emits **verified** setpoints to
-  the reflex loop (NEVER inside the <13 ms path; the gate from Stage ① sits in between).
-- 🔴 **P2.6** Governance: persistent workspace; agent refuses/flags low-confidence actions
-  (kill knowledge-boundary overconfidence).
+**Stage ② — Supervisory loop (wire brain → reflex). — 🟢 DONE** *(ADR 0006)*
+- 🟢 **P2.4** MeTTa knowledge base in `metta-logic/knowledge/`: `world.metta` (envelope + env
+  facts), `mission.metta` (per-mode goal + the `decide-setpoint` reasoning rule), `agent.metta`
+  (self identity/confidence). Proposals are clamped into the envelope so a healthy one is
+  gate-consistent by construction. `python3 metta-logic/run_supervise_smoke.py` green (2/2). *(done)*
+- 🟢 **P2.5** Slow supervisory loop: `nzi-core::supervise::Supervisor<B: SymbolicBrain>`. Each
+  `tick` asks the brain to propose a setpoint (KB + telemetry), runs it through the Stage-① gate,
+  and forwards ONLY approved setpoints to the reflex loop — the gate sits between the two rates,
+  never inside the <13 ms path. Emits a `BrainDecision` per tick. `FakeBrain` unit tests +
+  venv-backed `supervise_integration.rs` + `cargo run -p nzi-core --bin supervise-demo`. *(done)*
+- 🟢 **P2.6** Governance (**fail-closed**): the supervisor retains the last-known-safe setpoint and
+  holds it on any non-approval — `Refused(<check>)` (gate rejected) or `HeldOnDoubt(<reason>)`
+  (empty/unparseable/errored proposal). Doubt is never treated as approval. Proven by the
+  stale-telemetry integration test (refused → last-safe held). *(done)*
 
 **Stage ③ — Partitioned Atomspace (retire the O(n) risk).**
 - 🔴 **P2.7** ⚠️ **Implement ADR 0002** — small hot working-space per agent + rule-driven inference
