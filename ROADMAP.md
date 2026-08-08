@@ -127,19 +127,24 @@ are caught by the verification layer, not acted on; query p99 is flat vs. knowle
 
 ---
 
-## Phase 3 — First Real Task: Precision-Ag Perception (Weeks 10–13)
+## Phase 3 — First Real Task: Precision-Ag Perception (Weeks 10–13) — 🟢 DONE (build-here parts)
 *Goal: the bot does something economically real — in sim first.*
 
-- 🔴 **P3.1** Weed/pest detection model (Python/ML) on simulated crop imagery.
-- 🔴 **P3.2** Sensor fusion (vision + context) feeding the MeTTa brain; symbolic rules decide
-  "treat / don't treat" with justification.
-- ⏭️ **P3.3 → Phase 7** Synthetic-data pipeline in Unity to fight the robotics data-scarcity
-  bottleneck (generate long-tail cases). *Needs the Unity engine; the detection model + symbolic
-  treat/don't-treat logic (P3.1/P3.2/P3.4) can use public/recorded imagery here without it.*
-- 🔴 **P3.4** Metrics: detection precision/recall + simulated pesticide-reduction %.
+- 🟢 **P3.1** Weed/pest detector in `perception/` (stdlib-only, deterministic): `synth.py`
+  procedurally generates labeled crop/weed/soil patches with interpretable channels; `model.py` is
+  a multiclass logistic-regression classifier → `Detection(class, confidence)`. *(done)*
+- 🟢 **P3.2** Perception→symbolic fusion: `perception/decide.py` runs a `Detection` through
+  `metta-logic/agronomy/treat.metta`, which decides **treat/skip WITH justification** and is
+  **fail-closed** — it sprays only a *confident* weed; an uncertain weed is skipped, never sprayed
+  on a guess (so the symbolic gate can only ever reduce spraying). *(done)*
+- ⏭️ **P3.3 → Phase 7** Synthetic-data pipeline in Unity for long-tail cases. `synth.py` is the
+  honest headless stand-in that let us build+measure the decision pipeline now.
+- 🟢 **P3.4** Metrics (`model.evaluate`): held-out **accuracy ~0.88, weed F1 ~0.85** (task tuned to
+  overlap so the score is honest), and **~70% pesticide reduction** vs. a blanket spray. 7 tests
+  (`perception/tests/`), symbolic ones skip-gracefully w/o hyperon. *(done)*
 
-**Exit criteria:** one bot identifies weeds/pests in sim and makes verifiable treat decisions,
-with a measured pesticide-reduction story.
+**Exit criteria — MET (in sim):** one bot identifies weeds and makes verifiable, justified treat
+decisions, with a measured ~70% pesticide-reduction story. Real imagery + Unity long-tail data → P7.
 
 ---
 
