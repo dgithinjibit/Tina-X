@@ -9,6 +9,7 @@
 //! lives in [`crate::sons`] and is applied here.
 
 use crate::sons::LeaderBelief;
+use crate::stigmergy::COVERAGE_TARGET;
 
 /// Stable agent identifier = its index in the swarm's agent vector.
 pub type AgentId = u32;
@@ -92,7 +93,7 @@ impl Agent {
     ///   converge to a single leader per connected component with no central coordinator — and if
     ///   that leader dies, the remaining agents re-converge on a new one (self-healing brain).
     /// - Coverage: decide whether to cover this tick from the LOCAL cell level only (stigmergy).
-    pub fn consume(&mut self, inbox: Vec<Message>, local_level: u32) {
+    pub fn consume(&mut self, inbox: Vec<Message>, local_level: f64) {
         // Loop-free distributed gradient election. An agent adopts a remote leader ONLY through a
         // neighbor that is STRICTLY CLOSER to that leader than the agent could otherwise be — i.e.
         // it takes each neighbor's reported distance, adds one hop, and keeps the best. The leader
@@ -136,10 +137,6 @@ impl Agent {
     }
 }
 
-/// Desired number of marks a cell should accumulate before agents stop actively covering it.
-/// Small constant; the point is that coverage is driven by local marks, not a global schedule.
-pub const COVERAGE_TARGET: u32 = 3;
-
 #[cfg(test)]
 mod tests {
     use super::*;
@@ -167,7 +164,7 @@ mod tests {
         let mut a = Agent::new(1, 0, 0);
         // Neighbor 9 claims itself as leader at distance 0.
         let inbox = vec![Message { from: 9, leader: LeaderBelief::own(9) }];
-        a.consume(inbox, 0);
+        a.consume(inbox, 0.0);
         assert_eq!(a.belief().leader, 9, "should defer to the higher-id leader");
         assert_eq!(a.belief().distance, 1, "one hop away via the neighbor");
         assert!(!a.is_leader());
@@ -177,7 +174,7 @@ mod tests {
     fn consume_keeps_own_leadership_over_a_lower_id() {
         let mut a = Agent::new(7, 0, 0);
         let inbox = vec![Message { from: 2, leader: LeaderBelief::own(2) }];
-        a.consume(inbox, 0);
+        a.consume(inbox, 0.0);
         assert_eq!(a.belief().leader, 7, "higher own id wins");
         assert!(a.is_leader());
     }
@@ -185,7 +182,7 @@ mod tests {
     #[test]
     fn covering_follows_local_level_only() {
         let mut a = Agent::new(0, 0, 0);
-        a.consume(vec![], 0);
+        a.consume(vec![], 0.0);
         assert!(a.is_covering(), "under-covered cell -> cover");
         a.consume(vec![], COVERAGE_TARGET);
         assert!(!a.is_covering(), "sufficiently covered cell -> stop");

@@ -122,10 +122,13 @@ impl Swarm {
     /// Advance the whole swarm by one tick with STRICTLY neighbor-local information flow:
     ///   1. every alive agent produces outbound messages from its own state only,
     ///   2. messages are delivered to each recipient's inbox (only along the topology edges),
-    ///   3. every alive agent consumes its inbox + marks its local stigmergy cell.
+    ///   3. every alive agent consumes its inbox + deposits pheromone on its local stigmergy cell,
+    ///   4. the whole pheromone field evaporates one tick (ACO decay — the "useful forgetting"
+    ///      that lets coverage re-flow to stale gaps; see `stigmergy` A1/A2).
     ///
     /// Steps (1) and (3) are separated so all agents act on the SAME tick's snapshot — no agent
     /// sees another's within-tick update, which would smuggle in global/instantaneous knowledge.
+    /// Evaporation (4) runs AFTER deposits, matching ACO's deposit-then-evaporate update order.
     pub fn step(&mut self) {
         self.tick += 1;
 
@@ -158,11 +161,15 @@ impl Swarm {
             let inbox = inboxes.remove(&(i as AgentId)).unwrap_or_default();
             let (x, y) = self.agents[i].position();
             self.agents[i].consume(inbox, self.field.level(x, y));
-            // Stigmergy: an agent that is actively covering marks its current cell.
+            // Stigmergy: an agent that is actively covering marks (deposits pheromone on) its cell.
             if self.agents[i].is_covering() {
                 self.field.mark(x, y);
             }
         }
+
+        // 4. Evaporate the shared pheromone field one tick (ACO decay). Done once, after all
+        //    deposits, so a covered cell's trail fades over time and coverage re-flows to gaps.
+        self.field.evaporate();
     }
 
     /// Run `ticks` steps. Convenience for demos/tests.

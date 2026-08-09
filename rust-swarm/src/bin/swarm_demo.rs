@@ -6,7 +6,7 @@
 //!
 //! Run:  cargo run -p nzi-swarm --bin swarm-demo
 
-use nzi_swarm::agent::COVERAGE_TARGET;
+use nzi_swarm::stigmergy::SERVICE_TARGET;
 use nzi_swarm::Swarm;
 
 fn main() {
@@ -30,12 +30,13 @@ fn main() {
     );
 
     // 2. Stigmergic coverage.
-    let cov = swarm.field().coverage_fraction(COVERAGE_TARGET);
+    let cov = swarm.field().coverage_fraction(SERVICE_TARGET);
     println!(
-        "  field coverage @ target {}: {:.0}%  ({} total marks laid)",
-        COVERAGE_TARGET,
+        "  field coverage @ service target {}: {:.0}%  ({} total marks laid, pheromone ρ={})",
+        SERVICE_TARGET,
         cov * 100.0,
-        swarm.field().total_marks()
+        swarm.field().total_marks(),
+        swarm.field().rho()
     );
 
     // 3. Kill the brain and watch it self-heal.

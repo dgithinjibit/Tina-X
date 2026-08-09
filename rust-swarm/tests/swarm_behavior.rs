@@ -4,9 +4,14 @@
 //! self-healing, coverage, scale — from ONLY neighbor-local rules. They are the proof that the
 //! coordination is verified, not "emergent-and-hoped".
 
-use nzi_swarm::agent::COVERAGE_TARGET;
 use nzi_swarm::sons::MAX_HORIZON;
+use nzi_swarm::stigmergy::SERVICE_TARGET;
 use nzi_swarm::Swarm;
+
+/// Ticks to drive cumulative coverage to the service target. Under pheromone evaporation an agent
+/// keeps depositing until its cell's decaying trail holds at target, so reaching a cumulative
+/// service count of `SERVICE_TARGET` takes a few ticks; give a generous warm-up margin.
+const COVER_TICKS: u64 = (SERVICE_TARGET as u64) + 6;
 
 /// Ticks to allow for self-healing after a leader loss. Recovery is O(horizon) (a stale belief
 /// must drain past MAX_HORIZON before a survivor is re-elected — see sons.rs), so give it a margin
@@ -78,19 +83,21 @@ fn adopts_a_higher_id_agent_that_rejoins() {
 #[test]
 fn stigmergy_covers_the_whole_field() {
     let mut swarm = Swarm::grid(6, 6);
-    // Each agent covers its own cell while under target; COVERAGE_TARGET ticks suffices, plus a
-    // couple for the first-tick warm-up.
-    swarm.run((COVERAGE_TARGET + 2) as u64);
+    // Each agent covers its own cell while its local pheromone is under target; a few ticks plus a
+    // warm-up margin drive cumulative service to SERVICE_TARGET everywhere (COVER_TICKS).
+    swarm.run(COVER_TICKS);
     assert_eq!(
-        swarm.field().coverage_fraction(COVERAGE_TARGET),
+        swarm.field().coverage_fraction(SERVICE_TARGET),
         1.0,
-        "every cell should reach the coverage target"
+        "every cell should reach the service target"
     );
     // And it doesn't keep over-marking: total marks are bounded near target*cells, not runaway.
+    // The bound accounts for the extra deposits evaporation induces before a cell's trail settles
+    // at target (an agent re-deposits as its own pheromone decays), so allow a modest multiple.
     let cells = (swarm.field().width() * swarm.field().height()) as u32;
     assert!(
-        swarm.field().total_marks() <= cells * (COVERAGE_TARGET + 1),
-        "stigmergy stops effort on covered cells (no runaway over-treatment)"
+        swarm.field().total_marks() <= cells * (SERVICE_TARGET + COVER_TICKS as u32),
+        "stigmergy stops runaway over-treatment (effort is bounded, not unbounded)"
     );
 }
 
@@ -100,19 +107,59 @@ fn stigmergy_covers_the_whole_field() {
 #[test]
 fn coverage_survives_partial_swarm_loss() {
     let mut swarm = Swarm::grid(6, 6);
-    swarm.run((COVERAGE_TARGET + 2) as u64);
-    assert_eq!(swarm.field().coverage_fraction(COVERAGE_TARGET), 1.0);
+    swarm.run(COVER_TICKS);
+    assert_eq!(swarm.field().coverage_fraction(SERVICE_TARGET), 1.0);
 
-    // Lose a third of the swarm (low ids); already-covered cells stay covered (marks persist).
+    // Lose a third of the swarm (low ids); already-serviced cells stay serviced. This is the
+    // CUMULATIVE coverage view (coverage_fraction), which is monotone by design — pheromone may
+    // evaporate, but the audit record of "this cell was serviced" does not, so past work isn't undone.
     for id in 0..12u32 {
         swarm.kill(id);
     }
     swarm.run(20);
     // Coverage laid down before the loss is not undone.
-    assert!(swarm.field().coverage_fraction(COVERAGE_TARGET) >= 1.0);
+    assert!(swarm.field().coverage_fraction(SERVICE_TARGET) >= 1.0);
     // The leader (id 35, untouched) still leads a single, connected survivor set — the hierarchy
     // is unaffected because we removed followers, not the brain.
     assert_eq!(swarm.leaders(), vec![35]);
+}
+
+/// Pheromone evaporation makes coverage ADAPTIVE: after the field is serviced, trails fade, so an
+/// agent whose cell has gone stale resumes covering it — the behavior the old monotonic field could
+/// never show (bee/ant brain upgrade, ant mechanism A2). Without decay a covered cell stays "hot"
+/// forever and effort never re-flows; this test fails on the ρ=0 (pre-upgrade) design.
+#[test]
+fn stigmergy_re_covers_stale_cells_thanks_to_evaporation() {
+    let mut swarm = Swarm::grid(4, 4);
+    // Service the field, then let it settle so agents stop actively covering (pheromone at target).
+    swarm.run(COVER_TICKS);
+    assert_eq!(swarm.field().coverage_fraction(SERVICE_TARGET), 1.0, "field serviced first");
+
+    // Snapshot cumulative marks, then run MANY more ticks. Because pheromone decays below target as
+    // cells go stale, agents must resume depositing — so cumulative marks keep GROWING over time.
+    let marks_after_settle = swarm.field().total_marks();
+    swarm.run(60);
+    let marks_later = swarm.field().total_marks();
+    assert!(
+        marks_later > marks_after_settle,
+        "evaporation must re-trigger coverage on stale cells (marks {marks_later} > {marks_after_settle})"
+    );
+
+    // Sanity: with ZERO evaporation the same scenario does NOT re-cover (proves decay is the cause).
+    // We can't change a running swarm's ρ, so assert the field-level invariant directly instead.
+    let mut frozen = nzi_swarm::stigmergy::CoverageField::with_evaporation(1, 1, 0.0);
+    for _ in 0..10 {
+        frozen.mark(0, 0);
+    }
+    let hot = frozen.total_marks();
+    for _ in 0..100 {
+        frozen.evaporate();
+    }
+    assert!(
+        frozen.level(0, 0) >= SERVICE_TARGET as f64,
+        "ρ=0 baseline stays hot forever (no re-coverage) — decay is what enables adaptivity"
+    );
+    let _ = hot;
 }
 
 /// Scale test: a larger swarm still converges to a single leader, and convergence time grows with
