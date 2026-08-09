@@ -47,6 +47,14 @@ for sampling; Denoising Thermodynamic Models "could be **10,000× more energy ef
   benchmarks*, not deployed weather models. Hardware today = XTR-0 proof-of-tech + open-source
   `thrml` Python lib (announced 2025-10-29). Treat as aspirational-but-real.
 - Source: https://extropic.ai/writing/thermodynamic-computing-from-zero-to-one
+- **Built (P5.4):** `thermodynamic.py` implements the *computation a TSU runs* — an Ising-style
+  energy over the binary hazard field (each cell fits its ensemble evidence AND wants to agree with
+  its 4 physically-close neighbors), sampled with **pbit Gibbs updates** (flip prob =
+  `sigmoid(bias + neighbor coupling)`, exactly the TSU pbit rule). On a CPU this **denoises the
+  per-cell ensemble speckle**: with gentle coupling it lowers Brier *and* the reliability penalty at
+  every lead time while leaving threshold skill (ETS) roughly neutral (verified in tests). We claim
+  **no energy number** — only the algorithm and its accuracy win are real today; the 10,000× is
+  hardware-simulation, not ours.
 
 ### C. Sensor fusion + spatiotemporal embeddings
 SteamCast's ablation proves position+time embeddings are decisive. Fuse radar + in-situ swarm

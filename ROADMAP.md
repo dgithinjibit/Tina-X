@@ -174,17 +174,42 @@ coordination is *verified* (12 unit + 7 emergent-behavior tests), not emergent-a
 
 ---
 
-## Phase 5 — Weather Nowcasting Edge Case (Weeks 19–23)
+## Phase 5 — Weather Nowcasting Edge Case (Weeks 19–23) — 🟢 DONE (build-here parts)
 *Goal: the flagship "wow." Distributed calibrated nowcasting — honest metrics, no 99% claims.*
 
-- 🔴 **P5.1** Baseline: reproduce a WoFS-style ML hazard classifier on public data; report
-  ETS / Brier / reliability (NOT accuracy).
-- 🔴 **P5.2** Swarm-as-sensor-fleet: nodes contribute in-situ readings + spatiotemporal embeddings.
-- 🔴 **P5.3** MeTTa symbolic constraint layer over ensemble outputs → interpretable hazard guidance.
-- 🔴 **P5.4** ⚠️ **Explore** Extropic `thrml` for cheap probabilistic on-device sampling (aspirational).
-- 🔴 **P5.5** Report lead-time & calibration improvements honestly.
+> Built headless in `weather-prediction/` (stdlib + optional venv for the MeTTa step). Because this
+> env has no radar archive/heavy ML, we built a **deterministic synthetic testbed** reproducing the
+> STRUCTURE of the WoFS task (an ensemble of noisy forecasts of a moving convective hazard); real
+> WoFS/radar data slots into the same interfaces later (→ tracked under "Open gaps" in the README).
+> The whole stack is scored with **Brier / reliability / ETS / lead time — never a "99% accuracy"
+> claim**. 10 tests green; `python3 weather-prediction/pipeline_demo.py` runs it end-to-end.
 
-**Exit criteria:** measurable improvement in calibrated hazard probability / lead time vs. baseline.
+- 🟢 **P5.1** Baseline ensemble nowcast (`nowcast.py`): `truth_at`/`ensemble`/`ensemble_prob` — a
+  probabilistic, reasonably-calibrated per-cell hazard probability from ensemble spread. *(done)*
+- 🟢 **P5.2** Swarm-as-sensor-fleet (`nowcast.swarm_prob`): nodes contribute in-situ readings that
+  sharpen the ensemble probability *where the fleet actually flies* — improves Brier/ETS locally
+  (proven where sensors are). *(done)*
+- 🟢 **P5.3** MeTTa symbolic constraint layer (`metta-logic/weather/hazard.metta` + `symbolic.py`):
+  **agreement-gated sharpening** — trust the ensemble's own consensus (sharpen toward the extreme
+  where members agree, stay soft where they genuinely disagree), then a bounded persistence nudge,
+  then classify (none/watch/warning) *with a reason*. Measured to lower Brier AND the reliability
+  penalty at every lead time while leaving ETS intact. (Replaced an earlier shrink-to-climatology
+  rule that *worsened* calibration on this under-confident ensemble.) *(done)*
+- 🟢 **P5.4** ⚠️ **Explored** Extropic-style thermodynamic sampling (`thermodynamic.py`,
+  aspirational-but-real): an Ising energy over the hazard field sampled with **pbit Gibbs updates**
+  (flip prob = `sigmoid(bias + neighbor coupling)` — the TSU pbit rule, fully neighbor-local). On a
+  CPU it **denoises per-cell speckle**: gentle coupling lowers Brier + reliability at every lead
+  time, ETS roughly neutral. **No energy number claimed** — only the algorithm + accuracy win are
+  real today (`thrml`/XTR-0 hardware is the future target). *(done)*
+- 🟢 **P5.5** Honest metrics (`verify.py`): Brier, reliability diagram + scalar penalty, ETS
+  (Gilbert skill, not fooled by rare events), lead-time skill table. Wired into the pipeline demo
+  and tests. *(done)*
+
+**Exit criteria — MET (in sim):** the full stack (ensemble → swarm → thermodynamic denoise →
+symbolic calibration) shows a measurable **reduction in the reliability penalty vs. the raw
+ensemble** at 6/30/60-min lead, with skill (ETS) held. Real WoFS/radar data + multi-region
+generalization → tracked in the README's "Open gaps." **Open-risk #5 retired** (we target calibrated
+skill, never a 99% claim).
 
 ---
 
@@ -246,7 +271,8 @@ here blocks the software story; each item has a scaffold or a headless equivalen
    retired the O(n) `query()` risk** (partitioned hot space, p99 flat vs. knowledge size).
 3. ⚠️ No Hyperon WASM/embedded/.NET path → **P6.3** builds the WASM target here; **P7.5** the embedded one.
 4. ⚠️ Untethered power at insect scale is unsolved → **P7.5** picks a realistic scale.
-5. ⚠️ 99% weather reliability is not real → **P5** targets calibrated skill instead.
+5. ✅ 99% weather reliability is not real → **P5 retired this**: the nowcasting stack reports
+   calibrated skill (Brier / reliability / ETS / lead time) and never a "99% accuracy" claim.
 
 ---
 

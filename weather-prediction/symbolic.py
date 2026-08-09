@@ -36,13 +36,23 @@ def _parse_prob(atom: str) -> float | None:
         return None
 
 
-def apply_guidance(prob, members, prev_truth, metta) -> list[list[float]]:
+def apply_guidance(prob, members, prev_truth, metta=None) -> list[list[float]]:
     """Return a new probability field with the MeTTa symbolic calibration applied per cell.
 
     Batches all cells into ONE MeTTa program (fast) and reads back the calibrated prob per cell.
     Falls back to the input probability for any cell whose verdict fails to parse (fail-safe: we
     never fabricate a hazard number we didn't get from the rules).
+
+    IMPORTANT: each call runs against a FRESH MeTTa space. Reusing one long-lived space across calls
+    re-adds the preamble's `(= ...)` rule definitions every time, and duplicate equations become
+    OVERLAPPING clauses — a known hyperon gotcha (see memory: nzi-metta-gotchas) that makes eval
+    non-deterministic and blows up wall-time super-linearly. A fresh space per call keeps it linear.
+    The `metta` argument is accepted for backwards-compatibility but intentionally not reused as the
+    space; pass one or omit it, either way we evaluate in a clean space.
     """
+    from hyperon import MeTTa  # local import so the module loads without hyperon for stdlib callers
+
+    metta = MeTTa()  # always a clean space — do NOT accumulate rules/atoms across calls
     size = len(prob)
     preamble = guidance_preamble()
 
