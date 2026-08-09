@@ -50,3 +50,13 @@ Cairo wins for *on-chain later*. We don't have to choose one forever — we sequ
 - `scarb cairo-test` (in `zk-cairo/`) passes the same rule's tests.
 - Next ZK statement (e.g. "decision came from the signed MeTTa ruleset") is prototyped in
   `zk-rust` first, per this ADR.
+
+## Addendum — 2026-08-09 (Phase 6 kickoff): Cairo goes DORMANT
+`zk-rust` is proven, fast, and verifying end-to-end, so we commit to it as the sole ZK path we
+build on. **We no longer maintain `zk-cairo` as a live mirror.** It stays in-tree as a reference
+implementation of the same statement, but is **deferred/optional**: we will not invest in it,
+will not keep it in lock-step with `zk-rust`, and will NOT block on Starknet-native on-chain
+settlement. On-chain settlement (when we do it) goes through a Rust/EVM-friendly BN254 verifier
+route instead. This is reversible — if a Starknet-native settlement requirement appears, we
+re-activate `zk-cairo` from this frozen reference. Supersedes the "keep the mirror alive so the
+port is mechanical" stance in the Decision above. ROADMAP P6.2 updated to match.

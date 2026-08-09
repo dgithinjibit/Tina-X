@@ -217,8 +217,11 @@ skill, never a 99% claim).
 *Goal: real-world credibility — **on-chain work stays here** (testnet is reachable now).*
 
 - 🔴 **P6.1** Robonomics integration: agent identity, signed telemetry, missions — on **testnet**.
-- 🔴 **P6.2** Deploy the ZK verifier on **Starknet testnet** (the local `zk-cairo` prove/verify
-  already works; testnet deploy is reachable from here, so it is NOT deferred).
+- 🔴 **P6.2** Settle the ZK verifier on-chain via the **Rust/arkworks (BN254 Groth16)** path — a
+  cheap, EVM-friendly verifier. Per the **ADR 0004 addendum (2026-08-09)** `zk-cairo` is now
+  **dormant** (frozen reference mirror, not maintained); the Starknet-native route is deferred/
+  optional and only revived if a Starknet settlement requirement appears. `zk-rust` proves+verifies
+  today (setup 431 ms / prove 161 ms / verify 3.5 ms), so this is the path we build on.
 - 🔴 **P6.3** WASM target for `rust-core` (⚠️ build from scratch — no Hyperon support today). WASM
   builds and runs in this environment, so it stays here; the *embedded/on-metal* target is P7.
 
@@ -252,10 +255,11 @@ here blocks the software story; each item has a scaffold or a headless equivalen
   landing & dashboard). Grows every phase; this is the live artifact judges/YC open. Wire each new
   capability (brain decisions, weather nowcasts, swarm view) into it as it lands.
 - **ZK verifiable decisions** — 🟢 foundation set: `zk-rust/` (arkworks Groth16, working
-  prove/verify) + `zk-cairo/` (Starknet-native mirror). Per ADR 0004: build in Rust, settle
-  on-chain in Cairo later. On-chain settlement targets a **testnet** (reachable now — NOT deferred
-  to Phase 7). Next statement: prove a decision came from the signed MeTTa ruleset; then deploy the
-  verifier to Starknet testnet (P6.2) and attach proofs to on-chain telemetry (P6.1 Robonomics).
+  prove/verify) is now the **sole ZK path we build on**. `zk-cairo/` is **dormant** (frozen
+  reference mirror, not maintained) per the **ADR 0004 addendum (2026-08-09)** — Rust proves+
+  verifies today, so we commit to it; the Starknet-native route is deferred/optional. Next
+  statement: prove a decision came from the signed MeTTa ruleset; then settle via a Rust/EVM-
+  friendly BN254 verifier (P6.2) and attach proofs to on-chain telemetry (P6.1 Robonomics).
 - **TINA-X (flagship reasoning app)** — 🟢 core built: `tina-x/` independent component
   (ADR 0005). MeTTa dependency graph + cascading-failure rules + Python black-swan injector +
   optional Nzi-dashboard bridge (verified end-to-end). Next: OSM ingestion (real region),
