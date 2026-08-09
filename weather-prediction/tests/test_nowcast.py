@@ -11,6 +11,7 @@ from pathlib import Path
 sys.path.insert(0, str(Path(__file__).resolve().parents[1]))
 
 from nowcast import ensemble, ensemble_prob, swarm_prob, truth_at  # noqa: E402
+from gnss_pwv import PWV_DRY, PWV_MOIST, PwvStation, gnss_pwv_prob, pwv_to_signal  # noqa: E402
 from thermodynamic import energy, thermodynamic_prob  # noqa: E402
 from verify import brier_score, ets, reliability  # noqa: E402
 
@@ -62,6 +63,54 @@ def test_swarm_fusion_improves_brier_where_sensors_are():
     fused = swarm_prob(base, truth, positions)
     # In-situ observations along the swarm path should reduce Brier (better local truth).
     assert brier_score(fused, truth) <= brier_score(base, truth)
+
+
+# --- GNSS-PWV observation input (G4D-RR bridge #5) ------------------------------------------
+
+def test_pwv_signal_ramps_between_dry_and_moist():
+    # Below dry -> 0; at/above moist -> 1; midpoint -> ~0.5. Bounded and monotone.
+    assert pwv_to_signal(PWV_DRY - 10) == 0.0
+    assert pwv_to_signal(PWV_MOIST + 10) == 1.0
+    mid = pwv_to_signal((PWV_DRY + PWV_MOIST) / 2)
+    assert abs(mid - 0.5) < 1e-9
+
+
+def test_pwv_can_only_raise_probability_and_stays_in_range():
+    base = [[0.2, 0.9], [0.0, 0.5]]
+    stations = [
+        PwvStation(0, 0, PWV_MOIST + 5),   # very moist over a low-prob cell -> should rise
+        PwvStation(1, 0, PWV_MOIST + 5),   # very moist over an already-high cell -> rises a little
+        PwvStation(0, 1, PWV_DRY - 5),     # dry -> no change
+    ]
+    out = gnss_pwv_prob(base, stations, weight=0.25)
+    assert out[0][0] > base[0][0], "moist air must raise a low-prob cell"
+    assert out[0][1] >= base[0][1], "PWV never lowers probability"
+    assert out[1][0] == base[1][0], "a DRY station adds no suspicion (cell unchanged)"
+    assert all(0.0 <= p <= 1.0 for row in out for p in row)
+    assert out[0][1] < 1.0, "PWV alone must never assert certainty (1.0)"
+
+
+def test_pwv_leaves_cells_without_a_station_untouched():
+    base = [[0.3, 0.4], [0.5, 0.6]]
+    out = gnss_pwv_prob(base, [PwvStation(0, 0, PWV_MOIST)], weight=0.3)
+    assert out[0][1] == base[0][1]
+    assert out[1][0] == base[1][0]
+    assert out[1][1] == base[1][1]
+
+
+def test_pwv_over_true_hazard_cells_improves_brier():
+    # The honest win, measured the SAME way as everything else: place moist stations on cells that
+    # ARE truly hazardous but the ensemble under-called. A gentle PWV nudge should not worsen Brier.
+    truth = truth_at(3, SIZE)
+    base = ensemble_prob(ensemble(3, SIZE, MEMBERS, SEED))
+    # Stations reporting moist air exactly on true-positive cells the ensemble under-forecast (<0.5).
+    stations = [
+        PwvStation(x, y, PWV_MOIST + 5)
+        for y in range(SIZE) for x in range(SIZE)
+        if truth.at(x, y) == 1 and base[y][x] < 0.5
+    ]
+    fused = gnss_pwv_prob(base, stations, weight=0.4)
+    assert brier_score(fused, truth) <= brier_score(base, truth) + 1e-9
 
 
 # --- symbolic calibration (P5.3) ------------------------------------------------------------

@@ -144,6 +144,16 @@ impl CoverageField {
     }
 }
 
+/// Desired **pheromone** level a cell should hold before agents stop actively covering it. With
+/// evaporation, a cell drops back under this once its trail fades — which is what makes coverage
+/// re-flow to stale gaps. Small constant; coverage is driven by local pheromone, not a global plan.
+pub const COVERAGE_TARGET: f64 = 3.0;
+
+/// Desired **cumulative** number of times a cell should be serviced before we call the field
+/// "covered" for progress metrics ([`CoverageField::coverage_fraction`]). This is the monotone
+/// audit target — distinct from the decaying pheromone [`COVERAGE_TARGET`] that gates live effort.
+pub const SERVICE_TARGET: u32 = 3;
+
 #[cfg(test)]
 mod tests {
     use super::*;
@@ -212,24 +222,14 @@ mod tests {
         for _ in 0..(COVERAGE_TARGET.ceil() as u32) {
             f.mark(0, 0);
         }
-        assert!(f.level(0, 0) >= COVERAGE_TARGET as f64, "freshly covered → hot");
+        assert!(f.level(0, 0) >= COVERAGE_TARGET, "freshly covered → hot");
         // Let it decay untended for many ticks.
         for _ in 0..30 {
             f.evaporate();
         }
         assert!(
-            f.level(0, 0) < COVERAGE_TARGET as f64,
+            f.level(0, 0) < COVERAGE_TARGET,
             "a long-untended cell must fade below target and become re-coverable"
         );
     }
 }
-
-/// Desired **pheromone** level a cell should hold before agents stop actively covering it. With
-/// evaporation, a cell drops back under this once its trail fades — which is what makes coverage
-/// re-flow to stale gaps. Small constant; coverage is driven by local pheromone, not a global plan.
-pub const COVERAGE_TARGET: f64 = 3.0;
-
-/// Desired **cumulative** number of times a cell should be serviced before we call the field
-/// "covered" for progress metrics ([`CoverageField::coverage_fraction`]). This is the monotone
-/// audit target — distinct from the decaying pheromone [`COVERAGE_TARGET`] that gates live effort.
-pub const SERVICE_TARGET: u32 = 3;

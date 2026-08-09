@@ -14,6 +14,7 @@
 
 pub mod atomspace;
 pub mod brain;
+pub mod quorum;
 pub mod reflex;
 pub mod roofline;
 pub mod supervise;

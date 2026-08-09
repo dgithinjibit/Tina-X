@@ -15,6 +15,9 @@ import { axesPresent, computeStats } from "./telemetry";
 import { useTelemetry } from "./useTelemetry";
 import { ReflexChart } from "./components/ReflexChart";
 import { BrainDecisionPanel } from "./components/BrainDecisionPanel";
+import { SwarmPanel } from "./components/SwarmPanel";
+import { FloodPanel } from "./components/FloodPanel";
+import { GnssPanel } from "./components/GnssPanel";
 import { BomTable } from "./components/BomTable";
 
 // Color per body axis so the three traces are easy to tell apart at a glance.
@@ -111,6 +114,43 @@ export function App() {
           the agent <em>reason</em>, not just act.
         </p>
         <BrainDecisionPanel decisions={decisions} />
+      </section>
+
+      {/* 2c. SWARM ---------------------------------------------------------------- */}
+      <section style={styles.section}>
+        <h2 style={styles.h2}>Self-organizing swarm — SoNS + bee/ant stigmergy</h2>
+        <p style={styles.muted}>
+          A headless fleet with <strong>no central controller</strong>. Agents elect one
+          &quot;brain&quot; by neighbor-local max-consensus (honeybee quorum), then cover the field
+          by depositing pheromone (ant stigmergy) that <em>evaporates</em> so stale coverage fades
+          and effort re-flows to gaps. Hit re-run to watch it converge from scratch.
+        </p>
+        <SwarmPanel />
+      </section>
+
+      {/* 2d. FLOOD EARLY WARNING (G4D-RR bridge #6) -------------------------------- */}
+      <section style={styles.section}>
+        <h2 style={styles.h2}>Flood early warning — GNSS/EO feed drives the swarm</h2>
+        <p style={styles.muted}>
+          A free, no-auth <strong>GEOGLOWS ECMWF Streamflow</strong> river-discharge forecast becomes
+          a flood-risk overlay the swarm biases its coverage toward — so the fleet concentrates on
+          the flooded corridor instead of spreading evenly. This is the honest GNSS/EO bridge for
+          disaster response: <em>flood</em> forecasting, not earthquake prediction.
+        </p>
+        <FloodPanel />
+      </section>
+
+      {/* 2e. GNSS POSITIONING (G4D-RR bridge #2) ---------------------------------- */}
+      <section style={styles.section}>
+        <h2 style={styles.h2}>GNSS positioning — real receiver fixes drive navigation</h2>
+        <p style={styles.muted}>
+          Raw <strong>NMEA</strong> output from a GNSS receiver (the multi-constellation{" "}
+          <code>GN</code> form carries <strong>Galileo</strong>) is parsed into a track and mapped
+          onto the operating grid — the swarm&apos;s navigation input. Void fixes are dropped, not
+          guessed. RTKLIB&apos;s RTK/PPP output is NMEA too, so the same path ingests centimeter-grade
+          positions later.
+        </p>
+        <GnssPanel />
       </section>
 
       {/* 3. HOW IT WORKS ---------------------------------------------------------- */}

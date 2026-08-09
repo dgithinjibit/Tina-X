@@ -244,6 +244,39 @@ here blocks the software story; each item has a scaffold or a headless equivalen
 
 ---
 
+## Phase 8 — GNSS/EO Bridge (G4D-RR hackathon) (Weeks 24+, parallel)
+*Goal: honestly connect the existing stack to a REAL GNSS + Earth-Observation layer for the
+**GNSS 4 Disaster Risk Reduction** hackathon (SATNAV Africa/DoraHacks; submission 2026-08-20→09-05).
+Every item names a real, free/open data source + library and extends an existing component — no
+vaporware. Full plan + citations: `docs/research/g4drr-gnss-eo-bridge.md`. Honesty guardrails:
+GNSS does **not** predict earthquakes; nowcasting stays calibrated (Brier/reliability/ETS); emerging
+services (EWSS, HydroGNSS open data) are labelled future, not usable-today.*
+
+- 🟢 **P8.6** **Flood EWS — GEOGLOWS ECMWF Streamflow** (bridge #6, built first — lowest effort,
+  highest demo value). A free, no-auth river-discharge forecast becomes a `HazardField` the SoNS
+  swarm biases coverage toward (`rust-swarm/src/hazard.rs`), served at `GET /api/flood`
+  (`rust-server/src/geoglows.rs`) and shown on the dashboard (`FloodPanel.tsx`). **Live feed** wired
+  behind the `live-feed` cargo feature (real `/api/v2/forecast` + `/api/v2/returnperiods`), degrading
+  to an offline fixture; JSON parsing unit-tested network-free. *Extends swarm coverage + adds a real
+  EO ingest. Lifts Applicability/Market/Impact.*
+- 🔴 **P8.1** **OSNMA → ZK safe-to-fly witness** (bridge #1). Extend `zk-rust`'s `SafeToFlyCircuit`
+  so `fly = 1` requires BOTH `wind ≤ tolerance` AND a position from **authenticated** Galileo signals
+  (Galileo OSNMA, operational Jul 2025). Anti-spoof authentication becomes part of the proof.
+  *Extends zk-rust. Lifts Originality/Impact/trust.*
+- 🔴 **P8.2** **GNSS position ingest — RTKLIB/NMEA** (bridge #2). Pure-Rust NMEA (RMC/GGA) parser +
+  offline fixture track feeding the swarm's navigation input; RTKLIB (C, RTK+PPP, Galileo) as an
+  opt-in subprocess later. *Extends swarm nav input. Lifts Applicability & Transferability/Market.*
+- 🔴 **P8.5** **GNSS-PWV nowcasting input** (bridge #5). GNSS-derived precipitable water vapor / ZTD
+  as a new real observation into the `weather-prediction` pipeline, keeping honest metrics.
+  *Extends the nowcasting pipeline. Lifts Significance/Sustainability/Originality.*
+- ⏭️ **P8.narrate** Cited-but-not-fully-wired for the BUIDL writeup: full Galileo HAS PPP stream,
+  SAR/Galileo Return-Link drone tasking, CYGNSS/HydroGNSS GNSS-R sensing, Sentinel-1 InSAR.
+
+**Exit criteria:** at least the flood-EWS + one GNSS bridge run live end-to-end on the dashboard,
+with an honest Kumamoto-anchored problem→solution narrative and dataset attribution.
+
+---
+
 ## Cross-cutting tracks (run continuously)
 - **Benchmarks** — keep `docs/benchmarks/` current; every real-time decision cites a number.
 - **Roofline/profiling** — 🟢 `rust-core/src/roofline.rs` + `docs/scaling/` (transferable ideas

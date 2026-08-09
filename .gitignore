@@ -25,3 +25,6 @@ unity-sim/Logs/
 *.swp
 .idea/
 .vscode/
+
+# Claude Code local session/settings data (not for the repo)
+.claude/

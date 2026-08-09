@@ -9,24 +9,26 @@ use std::time::Instant;
 fn main() {
     println!("Project Nzi — Rust-native ZK POC (arkworks Groth16 / BN254)");
 
-    // A realistic scenario: private wind 8 m/s, public tolerance 12 m/s -> decision "fly" (1).
-    let (wind, tolerance) = (8u64, 12u64);
-    let decision = safe_to_fly(wind, tolerance);
-    println!("  scenario: wind={wind} (PRIVATE), tolerance={tolerance} (public) -> decision={decision}");
+    // A realistic scenario: private wind 8 m/s + AUTHENTICATED (OSNMA) position, public tolerance
+    // 12 m/s -> decision "fly" (1). Fly needs BOTH safe wind AND authenticated signals (bridge #1).
+    let (wind, tolerance, authenticated) = (8u64, 12u64, true);
+    let decision = safe_to_fly(wind, tolerance, authenticated);
+    println!("  scenario: wind={wind} (PRIVATE), OSNMA authenticated={authenticated} (PRIVATE), tolerance={tolerance} (public) -> decision={decision}");
 
     let t = Instant::now();
     let zk = SafeToFlyZk::setup().expect("setup");
     println!("  setup    : {:?}", t.elapsed());
 
     let t = Instant::now();
-    let proof = zk.prove(wind, tolerance, decision).expect("prove");
+    let proof = zk.prove(wind, authenticated, tolerance, decision).expect("prove");
     println!("  prove    : {:?}", t.elapsed());
 
     let t = Instant::now();
     let ok = zk.verify(tolerance, decision, &proof).expect("verify");
     println!("  verify   : {:?}  -> valid={ok}", t.elapsed());
 
-    // Show the verifier truly doesn't learn wind: it only ever received (tolerance, decision).
-    println!("  note     : verifier used only public inputs (tolerance, decision); wind stayed hidden.");
+    // Show the verifier truly doesn't learn wind OR the raw auth data: it only ever received
+    // (tolerance, decision). "Positioned by authenticated signals" is proven without revealing them.
+    println!("  note     : verifier used only public inputs (tolerance, decision); wind + OSNMA status stayed hidden.");
     println!("  RESULT: {}", if ok { "OK — decision proven in zero knowledge." } else { "FAIL" });
 }

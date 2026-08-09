@@ -45,6 +45,12 @@ pub const VALUE_BITS: usize = 8;
 pub struct SafeToFlyCircuit<F: PrimeField> {
     /// Private: the wind reading (witness). Hidden from the verifier.
     pub wind: Option<F>,
+    /// Private: whether the position fix came from AUTHENTICATED Galileo signals — the OSNMA
+    /// (Open Service Navigation Message Authentication) status, 1 = authenticated, 0 = not
+    /// (G4D-RR bridge #1; see docs/research/g4drr-gnss-eo-bridge.md). A witness, not public: the
+    /// verifier learns the drone *was* positioned by non-spoofed signals WITHOUT seeing any raw
+    /// signal data. This is what makes "safe-to-fly" resistant to a spoofed-GNSS attack.
+    pub authenticated: Option<F>,
     /// Public: the agent's published tolerance.
     pub tolerance: Option<F>,
     /// Public: the claimed decision (1 = fly, 0 = refuse).
@@ -57,6 +63,9 @@ impl<F: PrimeField> ConstraintSynthesizer<F> for SafeToFlyCircuit<F> {
         // 1. Allocate variables. `new_witness` = private, `new_input` = public.
         let wind = FpVar::new_witness(cs.clone(), || {
             self.wind.ok_or(SynthesisError::AssignmentMissing)
+        })?;
+        let authenticated = FpVar::new_witness(cs.clone(), || {
+            self.authenticated.ok_or(SynthesisError::AssignmentMissing)
         })?;
         let tolerance = FpVar::new_input(cs.clone(), || {
             self.tolerance.ok_or(SynthesisError::AssignmentMissing)
@@ -80,11 +89,21 @@ impl<F: PrimeField> ConstraintSynthesizer<F> for SafeToFlyCircuit<F> {
         let shifted = &tolerance - &wind + &offset; // in range [1, 2^(VALUE_BITS+1) - 1]
         let shifted_bits = to_bits_le_checked(&shifted, VALUE_BITS + 1)?;
         // The top bit tells us wind <= tolerance.
-        let is_safe = shifted_bits[VALUE_BITS].clone();
+        let wind_ok = shifted_bits[VALUE_BITS].clone();
 
-        // 4. Constrain the decision to equal our computed is_safe (as a field element 0/1).
-        let is_safe_f = FpVar::from(is_safe);
-        decision.enforce_equal(&is_safe_f)?;
+        // 3b. Force `authenticated` to be a genuine boolean (0 or 1): auth * (auth - 1) == 0. Without
+        //     this a malicious prover could pass auth=2 etc. and short-circuit the AND below.
+        let one = FpVar::constant(F::one());
+        let auth_is_bool = &authenticated * (&authenticated - &one);
+        auth_is_bool.enforce_equal(&FpVar::constant(F::zero()))?;
+
+        // 4. Safe-to-fly requires BOTH conditions (bridge #1): within wind tolerance AND positioned
+        //    by AUTHENTICATED (OSNMA) signals. AND of two 0/1 field values is their product.
+        let wind_ok_f = FpVar::from(wind_ok);
+        let is_safe = &wind_ok_f * &authenticated;
+
+        // 5. Constrain the decision to equal our computed is_safe (a field element 0/1).
+        decision.enforce_equal(&is_safe)?;
 
         // Keep `wind_bits` "used" so the range check isn't optimized as dead (it constrains wind).
         let _ = wind_bits;
@@ -117,9 +136,12 @@ use ark_bn254::{Bn254, Fr};
 use ark_groth16::{Groth16, PreparedVerifyingKey, Proof, ProvingKey};
 use ark_snark::SNARK;
 
-/// The decision rule in plain Rust — the ground truth the circuit must match.
-pub fn safe_to_fly(wind: u64, tolerance: u64) -> u64 {
-    if wind <= tolerance {
+/// The decision rule in plain Rust — the ground truth the circuit must match. Safe-to-fly requires
+/// BOTH the wind within tolerance AND an OSNMA-authenticated position fix (`authenticated` = true),
+/// so a spoofed-GNSS agent (authenticated = false) can never be "safe" even in calm wind
+/// (G4D-RR bridge #1).
+pub fn safe_to_fly(wind: u64, tolerance: u64, authenticated: bool) -> u64 {
+    if wind <= tolerance && authenticated {
         1
     } else {
         0
@@ -139,17 +161,25 @@ impl SafeToFlyZk {
         // deployment MUST use a secure OS RNG (rand::rngs::OsRng) instead.
         let mut rng = <rand::rngs::StdRng as rand::SeedableRng>::seed_from_u64(0x4E5A_4900);
         // Setup only needs the circuit SHAPE, so all values are None.
-        let circuit = SafeToFlyCircuit::<Fr> { wind: None, tolerance: None, decision: None };
+        let circuit = SafeToFlyCircuit::<Fr> {
+            wind: None,
+            authenticated: None,
+            tolerance: None,
+            decision: None,
+        };
         let (pk, vk) = Groth16::<Bn254>::circuit_specific_setup(circuit, &mut rng)?;
         let pvk = Groth16::<Bn254>::process_vk(&vk)?;
         Ok(Self { pk, pvk })
     }
 
     /// Produce a proof that `decision` is the correct rule output for the (private) `wind` and
-    /// (public) `tolerance`.
+    /// (private) `authenticated` OSNMA status, given the (public) `tolerance`. The authentication
+    /// status stays a WITNESS: the proof attests "positioned by authenticated signals" without
+    /// revealing any signal data.
     pub fn prove(
         &self,
         wind: u64,
+        authenticated: bool,
         tolerance: u64,
         decision: u64,
     ) -> Result<Proof<Bn254>, SynthesisError> {
@@ -158,6 +188,7 @@ impl SafeToFlyZk {
         let mut rng = <rand::rngs::StdRng as rand::SeedableRng>::seed_from_u64(0x4E5A_4900);
         let circuit = SafeToFlyCircuit::<Fr> {
             wind: Some(Fr::from(wind)),
+            authenticated: Some(Fr::from(authenticated as u64)),
             tolerance: Some(Fr::from(tolerance)),
             decision: Some(Fr::from(decision)),
         };
@@ -185,25 +216,52 @@ mod tests {
 
     #[test]
     fn plain_rule_matches_expectations() {
-        assert_eq!(safe_to_fly(8, 12), 1); // safe
-        assert_eq!(safe_to_fly(12, 12), 1); // boundary is safe (<=)
-        assert_eq!(safe_to_fly(20, 12), 0); // unsafe
+        // Fly requires wind within tolerance AND an authenticated (OSNMA) position.
+        assert_eq!(safe_to_fly(8, 12, true), 1); // safe wind + authenticated -> fly
+        assert_eq!(safe_to_fly(12, 12, true), 1); // boundary is safe (<=)
+        assert_eq!(safe_to_fly(20, 12, true), 0); // wind too high -> refuse
+        assert_eq!(safe_to_fly(8, 12, false), 0); // calm but SPOOFED (unauthenticated) -> refuse
+        assert_eq!(safe_to_fly(20, 12, false), 0); // both bad -> refuse
     }
 
     #[test]
-    fn honest_safe_decision_proves_and_verifies() {
+    fn honest_safe_authenticated_decision_proves_and_verifies() {
         let zk = SafeToFlyZk::setup().unwrap();
-        // wind=8 <= tol=12 -> decision should be 1
-        let proof = zk.prove(8, 12, 1).unwrap();
+        // wind=8 <= tol=12 AND authenticated -> decision should be 1
+        let proof = zk.prove(8, true, 12, 1).unwrap();
         assert!(zk.verify(12, 1, &proof).unwrap());
     }
 
     #[test]
     fn honest_unsafe_decision_proves_and_verifies() {
         let zk = SafeToFlyZk::setup().unwrap();
-        // wind=20 > tol=12 -> decision should be 0
-        let proof = zk.prove(20, 12, 0).unwrap();
+        // wind=20 > tol=12 -> decision should be 0 (regardless of auth)
+        let proof = zk.prove(20, true, 12, 0).unwrap();
         assert!(zk.verify(12, 0, &proof).unwrap());
+    }
+
+    #[test]
+    fn spoofed_position_cannot_prove_safe_even_in_calm_wind() {
+        // The bridge-#1 property: calm wind (8 <= 12) but UNAUTHENTICATED (spoofed) signals must
+        // yield a refuse (0). An honest agent proves decision=0 fine...
+        let zk = SafeToFlyZk::setup().unwrap();
+        let proof = zk.prove(8, false, 12, 0).unwrap();
+        assert!(zk.verify(12, 0, &proof).unwrap());
+    }
+
+    #[test]
+    fn a_spoofed_agent_cannot_fabricate_a_fly_proof() {
+        // ...and it CANNOT fabricate a "fly" (1) proof while unauthenticated: the constraints are
+        // unsatisfiable (is_safe = wind_ok AND auth = 1*0 = 0 ≠ 1), so proving aborts. This is the
+        // anti-spoofing guarantee OSNMA-as-a-witness buys us.
+        let prev_hook = std::panic::take_hook();
+        std::panic::set_hook(Box::new(|_| {}));
+        let result = std::panic::catch_unwind(|| {
+            let zk = SafeToFlyZk::setup().unwrap();
+            zk.prove(8, false, 12, 1) // calm wind, spoofed, claiming FLY -> impossible
+        });
+        std::panic::set_hook(prev_hook);
+        assert!(result.is_err(), "an unauthenticated agent must not yield a valid fly proof");
     }
 
     #[test]
@@ -220,7 +278,7 @@ mod tests {
         std::panic::set_hook(Box::new(|_| {}));
         let result = std::panic::catch_unwind(|| {
             let zk = SafeToFlyZk::setup().unwrap();
-            zk.prove(20, 12, 1)
+            zk.prove(20, true, 12, 1)
         });
         std::panic::set_hook(prev_hook);
         assert!(result.is_err(), "a lying assignment must not yield a valid proof");
@@ -230,7 +288,7 @@ mod tests {
     fn proof_for_one_decision_does_not_verify_as_another() {
         // An honest proof for decision=1 must not verify against a claimed decision=0.
         let zk = SafeToFlyZk::setup().unwrap();
-        let proof = zk.prove(8, 12, 1).unwrap();
+        let proof = zk.prove(8, true, 12, 1).unwrap();
         assert!(!zk.verify(12, 0, &proof).unwrap());
     }
 }

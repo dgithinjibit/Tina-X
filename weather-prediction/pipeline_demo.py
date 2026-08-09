@@ -25,6 +25,7 @@ from pathlib import Path
 sys.path.insert(0, str(Path(__file__).resolve().parent))
 
 from nowcast import ensemble, ensemble_prob, swarm_prob, truth_at  # noqa: E402
+from gnss_pwv import PWV_DRY, PWV_MOIST, PwvStation, gnss_pwv_prob  # noqa: E402
 from thermodynamic import thermodynamic_prob  # noqa: E402
 from verify import brier_score, ets, lead_time_curve, reliability  # noqa: E402
 
@@ -42,6 +43,18 @@ LEADS = {6: 1, 30: 5, 60: 10}
 def sensor_positions(size: int) -> list[tuple[int, int]]:
     """A swarm covering a diagonal swath of the field — where the fleet actually flies."""
     return [(i, i) for i in range(size)] + [(i, min(size - 1, i + 1)) for i in range(size)]
+
+
+def pwv_stations(truth, size: int) -> list[PwvStation]:
+    """A sparse net of ground GNSS stations reporting PWV (G4D-RR bridge #5). Synthetic feed: moist
+    air over currently-hazardous cells, dry elsewhere — the plausible signal a real GNSS-met network
+    would carry. Placed on a coarse lattice (every 3rd cell) like real, sparse CORS coverage."""
+    stations = []
+    for y in range(0, size, 3):
+        for x in range(0, size, 3):
+            pwv = PWV_MOIST + 5.0 if truth.at(x, y) == 1 else PWV_DRY - 5.0
+            stations.append(PwvStation(x, y, pwv))
+    return stations
 
 
 def score(prob, truth) -> dict:
@@ -67,6 +80,7 @@ def main() -> int:
 
     base_by_lead: dict[int, dict] = {}
     swarm_by_lead: dict[int, dict] = {}
+    pwv_by_lead: dict[int, dict] = {}
     therm_by_lead: dict[int, dict] = {}
     sym_by_lead: dict[int, dict] = {}
 
@@ -81,8 +95,12 @@ def main() -> int:
         swarm = swarm_prob(base, truth, positions)
         swarm_by_lead[lead_min] = score(swarm, truth)
 
-        # P5.4: neighbor-local pbit Gibbs sampling denoises the swarm-fused field.
-        therm = thermodynamic_prob(swarm, seed=SEED)
+        # Bridge #5: GNSS-PWV ground stations add a moisture-availability observation (gentle nudge).
+        pwv = gnss_pwv_prob(swarm, pwv_stations(truth, SIZE))
+        pwv_by_lead[lead_min] = score(pwv, truth)
+
+        # P5.4: neighbor-local pbit Gibbs sampling denoises the PWV-informed field.
+        therm = thermodynamic_prob(pwv, seed=SEED)
         therm_by_lead[lead_min] = score(therm, truth)
 
         if have_symbolic:
@@ -96,6 +114,8 @@ def main() -> int:
     say(lead_time_curve(base_by_lead))
     say("\n  [P5.2] + swarm-as-sensor-fleet (in-situ sharpening):")
     say(lead_time_curve(swarm_by_lead))
+    say("\n  [G4D-RR #5] + GNSS-PWV ground-station moisture observation:")
+    say(lead_time_curve(pwv_by_lead))
     say("\n  [P5.4] + thermodynamic pbit sampling (neighbor-local denoise):")
     say(lead_time_curve(therm_by_lead))
     if have_symbolic:
