@@ -1,4 +1,4 @@
-"""Project Nzi — perception -> symbolic treatment decision bridge (P3.2).
+"""Project TINA-X — perception -> symbolic treatment decision bridge (P3.2).
 
 This is the sensor-fusion / decision seam: it takes a model Detection, hands it to the MeTTa
 agronomy rules (metta-logic/agronomy/treat.metta), and returns a verifiable treat/skip verdict

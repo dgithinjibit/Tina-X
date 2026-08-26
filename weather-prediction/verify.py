@@ -1,4 +1,4 @@
-"""Project Nzi — honest nowcast verification metrics (P5.5), stdlib only.
+"""Project TINA-X — honest nowcast verification metrics (P5.5), stdlib only.
 
 The metrics we ACTUALLY report (never a headline "accuracy"):
   * Brier score          — mean squared error of probabilistic forecasts; lower = better. The

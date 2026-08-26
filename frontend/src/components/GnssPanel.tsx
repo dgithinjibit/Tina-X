@@ -28,7 +28,7 @@ export function GnssPanel() {
   if (error) {
     return (
       <p data-testid="gnss-error" style={{ color: "#fbbf24" }}>
-        No GNSS data. Start the API server: <code>cargo run -p nzi-server</code>{" "}
+        No GNSS data. Start the API server: <code>cargo run -p tina-server</code>{" "}
         <span style={{ color: "#6b7fa3" }}>({error})</span>
       </p>
     );

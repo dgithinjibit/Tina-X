@@ -1,6 +1,6 @@
 # 🎮 unity-sim — Phase 1 simulation (scaffold)
 
-Unity ML-Agents scene for **one** Nzi agent: physics + rendering + obstacles. This is the
+Unity ML-Agents scene for **one** TINA-X agent: physics + rendering + obstacles. This is the
 "real plant" the Rust reflex loop stabilizes against, replacing the toy rate-integrator in
 `rust-server/src/sim.rs`.
 
@@ -19,7 +19,7 @@ We do **not** re-implement the controller in C#. The whole point of the two-rate
 (ADR 0001) is one authoritative reflex loop. So:
 
 ```
-        ┌────────────── Unity (C#) ──────────────┐        ┌──────── Rust (nzi-core) ────────┐
+        ┌────────────── Unity (C#) ──────────────┐        ┌──────── Rust (tina-core) ────────┐
         │  Rigidbody physics + gyro + actuators   │        │  ReflexStabilizer / Attitude     │
         │                                         │        │  Stabilizer (the SAME code that  │
         │  every FixedUpdate:                     │        │  runs on real hardware)          │
@@ -43,7 +43,7 @@ behind the same message contract later if the socket round-trip becomes the bott
 ## The wire contract (authoritative: `BRIDGE_CONTRACT.md`)
 
 One JSON object per line, both directions. See [`BRIDGE_CONTRACT.md`](./BRIDGE_CONTRACT.md) for
-the exact fields. The C# structs in `Assets/Nzi/Scripts/BridgeMessages.cs` and the Rust types in
+the exact fields. The C# structs in `Assets/TINA-X/Scripts/BridgeMessages.cs` and the Rust types in
 `rust-core/src/unity_bridge.rs` are two views of the SAME contract — change one, change both.
 
 ---
@@ -52,9 +52,9 @@ the exact fields. The C# structs in `Assets/Nzi/Scripts/BridgeMessages.cs` and t
 
 | File | Role |
 |---|---|
-| `Assets/Nzi/Scripts/NziAgent.cs` | ML-Agents `Agent`: reads gyro, calls the bridge, applies torque. |
-| `Assets/Nzi/Scripts/ReflexBridgeClient.cs` | Thin TCP client that talks the JSON contract to Rust. |
-| `Assets/Nzi/Scripts/BridgeMessages.cs` | C# structs mirroring the bridge JSON (matches Rust). |
+| `Assets/TINA-X/Scripts/TinaXAgent.cs` | ML-Agents `Agent`: reads gyro, calls the bridge, applies torque. |
+| `Assets/TINA-X/Scripts/ReflexBridgeClient.cs` | Thin TCP client that talks the JSON contract to Rust. |
+| `Assets/TINA-X/Scripts/BridgeMessages.cs` | C# structs mirroring the bridge JSON (matches Rust). |
 | `BRIDGE_CONTRACT.md` | The language-neutral message contract (source of truth). |
 | `SCENE_SETUP.md` | Step-by-step: how to build the scene in the Unity editor. |
 

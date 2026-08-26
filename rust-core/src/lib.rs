@@ -1,4 +1,4 @@
-//! Project Nzi — agent core (Phase 0 scaffold).
+//! Project TINA-X — agent core (Phase 0 scaffold).
 //!
 //! This crate holds the **fast side** of the two-rate brain (see ROADMAP.md / README.md):
 //! a low-latency reflex loop inspired by the fly's haltere system. Symbolic reasoning

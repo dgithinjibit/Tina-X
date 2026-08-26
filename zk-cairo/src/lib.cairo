@@ -1,4 +1,4 @@
-//! Project Nzi ZK POC (Cairo) — the "Verifiable Safe-to-Fly Decision" (see docs/zk/).
+//! Project TINA-X ZK POC (Cairo) — the "Verifiable Safe-to-Fly Decision" (see docs/zk/).
 //!
 //! # For a junior dev
 //! This is the SAME rule as the Rust POC and the MeTTa brain:

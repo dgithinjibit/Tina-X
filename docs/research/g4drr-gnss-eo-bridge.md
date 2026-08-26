@@ -123,5 +123,5 @@ Bridge #6 (GEOGLOWS flood-EWS) is implemented end-to-end and both the offline an
 - **Live feed (real GEOGLOWS v2 REST):** behind the `live-feed` cargo feature (optional `ureq` dep). Endpoints verified against the `geoglows/geoglows-rest-api` source:
   - `GET https://geoglows.ecmwf.int/api/v2/forecast/<river_id>?format=json` → peak = `max(flow_median)`
   - `GET https://geoglows.ecmwf.int/api/v2/returnperiods/<river_id>?format=json` → threshold = `return_periods["2"]`
-  - **Run it:** `NZI_GEOGLOWS_LIVE=1 cargo run -p nzi-server --features live-feed`. Degrades to the fixture on any network/parse failure; `source` field reports `"geoglows-live"` vs `"fixture"` honestly. Swap the placeholder LINKNOs in `geoglows::default_sites()` for the target area's real river ids (find at https://data.geoglows.org).
+  - **Run it:** `TINA_X_GEOGLOWS_LIVE=1 cargo run -p tina-server --features live-feed`. Degrades to the fixture on any network/parse failure; `source` field reports `"geoglows-live"` vs `"fixture"` honestly. Swap the placeholder LINKNOs in `geoglows::default_sites()` for the target area's real river ids (find at https://data.geoglows.org).
   - JSON parsing is network-free unit-tested (`parse_forecast_peak_cms`, `parse_return_period_threshold`); only the HTTP call is feature-gated.

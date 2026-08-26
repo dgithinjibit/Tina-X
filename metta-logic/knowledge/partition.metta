@@ -1,4 +1,4 @@
-; Project Nzi — partitioned-Atomspace access pattern (P2.7, implements ADR 0002).
+; Project TINA-X — partitioned-Atomspace access pattern (P2.7, implements ADR 0002).
 ;
 ; THE PROBLEM (measured in P0.3, docs/benchmarks/metta-baseline.md):
 ;   direct `space.query()` over a flat GroundingSpace is ~O(n) — ~2 s @100k atoms, ~23 s @1M.

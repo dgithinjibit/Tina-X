@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""Project Nzi — MeTTa/Hyperon latency benchmark (P0.3, full).
+"""Project TINA-X — MeTTa/Hyperon latency benchmark (P0.3, full).
 
 The single most important Phase-0 de-risking step: MEASURE MeTTa latency before we lock in
 any real-time architecture. No vendor benchmarks exist (verified in research), so we produce
@@ -145,7 +145,7 @@ def main() -> int:
     import hyperon  # type: ignore
     version = getattr(hyperon, "__version__", "unknown")
 
-    print(f"Project Nzi — MeTTa latency benchmark (P0.3)  [hyperon {version}]")
+    print(f"Project TINA-X — MeTTa latency benchmark (P0.3)  [hyperon {version}]")
     print()
     print("== Parse vs Evaluate split (tiny Atomspace) ==")
     parse_r, eval_r = bench_parse_vs_eval(MeTTa)

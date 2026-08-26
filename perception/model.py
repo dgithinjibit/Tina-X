@@ -1,4 +1,4 @@
-"""Project Nzi — weed/pest detection model (P3.1) + honest metrics (P3.4), stdlib only.
+"""Project TINA-X — weed/pest detection model (P3.1) + honest metrics (P3.4), stdlib only.
 
 A small multiclass logistic-regression classifier (one-vs-rest, trained by batch gradient descent)
 over the interpretable channels from synth.py. No numpy/sklearn — pure Python — so it runs anywhere

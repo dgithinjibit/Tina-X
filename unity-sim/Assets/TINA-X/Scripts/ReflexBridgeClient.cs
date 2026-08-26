@@ -14,7 +14,7 @@ using System.IO;
 using System.Net.Sockets;
 using UnityEngine;
 
-namespace Nzi
+namespace TINA-X
 {
     public sealed class ReflexBridgeClient : IDisposable
     {
@@ -52,7 +52,7 @@ namespace Nzi
             }
             catch (Exception e)
             {
-                Debug.LogWarning($"[Nzi] reflex bridge connect failed: {e.Message}");
+                Debug.LogWarning($"[TINA-X] reflex bridge connect failed: {e.Message}");
                 Dispose();
             }
         }
@@ -82,7 +82,7 @@ namespace Nzi
                 // Cheap safety check: the reply must be for the reading we just sent.
                 if (command.step != reading.step)
                 {
-                    Debug.LogWarning($"[Nzi] step mismatch: sent {reading.step}, got {command.step}");
+                    Debug.LogWarning($"[TINA-X] step mismatch: sent {reading.step}, got {command.step}");
                     return false;
                 }
                 return true;
@@ -90,7 +90,7 @@ namespace Nzi
             catch (Exception e)
             {
                 // Timeout / disconnect: drop this frame, reconnect next tick (crash-tolerant).
-                Debug.LogWarning($"[Nzi] reflex exchange failed: {e.Message}");
+                Debug.LogWarning($"[TINA-X] reflex exchange failed: {e.Message}");
                 Dispose();
                 return false;
             }

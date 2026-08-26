@@ -1,4 +1,4 @@
-# Project Nzi — Rust workspace root
+# Project TINA-X — Rust workspace root
 # Phase 0 scaffold. See ROADMAP.md.
 [workspace]
 resolver = "2"
@@ -12,8 +12,8 @@ members = [
 [workspace.package]
 edition = "2021"
 license = "MIT"
-authors = ["Project Nzi contributors"]
-repository = "https://github.com/web4ke/Project-Nzi"
+authors = ["Project TINA-X contributors"]
+repository = "https://github.com/web4ke/Project-TINA-X"
 
 [workspace.dependencies]
 # Shared deps pinned here so every crate agrees on versions.

@@ -15,10 +15,10 @@
 //! suite stays green everywhere while proving the real gate wherever MeTTa is installed.
 //!
 //! Run it with output visible:
-//!   cargo test -p nzi-core --test verify_integration -- --nocapture
+//!   cargo test -p tina-core --test verify_integration -- --nocapture
 
-use nzi_core::brain::SubprocessBrain;
-use nzi_core::verify::{Context, Gate, Setpoint, Verdict};
+use tina_core::brain::SubprocessBrain;
+use tina_core::verify::{Context, Gate, Setpoint, Verdict};
 use std::path::PathBuf;
 
 fn project_root() -> PathBuf {

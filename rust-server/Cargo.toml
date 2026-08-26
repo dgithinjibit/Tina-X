@@ -1,14 +1,14 @@
 [package]
-name = "nzi-server"
+name = "tina-server"
 version = "0.0.1"
-description = "Project Nzi mission-control API: serves reflex telemetry + MeTTa decisions to the React dashboard"
+description = "Project TINA-X mission-control API: serves reflex telemetry + MeTTa decisions to the React dashboard"
 edition.workspace = true
 license.workspace = true
 authors.workspace = true
 
 [dependencies]
-nzi-core = { path = "../rust-core" }
-nzi-swarm = { path = "../rust-swarm" }
+tina-core = { path = "../rust-core" }
+tina-swarm = { path = "../rust-swarm" }
 axum = { version = "0.8", features = ["ws"] }
 tokio = { version = "1", features = ["rt-multi-thread", "macros", "sync", "time", "net"] }
 tower-http = { version = "0.6", features = ["cors"] }

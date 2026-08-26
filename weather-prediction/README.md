@@ -1,6 +1,6 @@
 # Weather Prediction Edge Case — Harsh-Weather Nowcasting
 
-> Flagship edge case for Project Nzi: real-time detection/prediction of harsh weather
+> Flagship edge case for Project TINA-X: real-time detection/prediction of harsh weather
 > (hailstorms, severe convection) so a swarm can *predict-and-act* — e.g. self-shelter,
 > reroute, or warn a community — before the event.
 > All figures below are cited and adversarially verified (deep-research run, 2026-08-08).
@@ -58,10 +58,10 @@ for sampling; Denoising Thermodynamic Models "could be **10,000× more energy ef
 
 ### C. Sensor fusion + spatiotemporal embeddings
 SteamCast's ablation proves position+time embeddings are decisive. Fuse radar + in-situ swarm
-sensors (each Nzi node is a mobile weather probe) + temporal context. Insect-inspired multimodal
+sensors (each TINA-X node is a mobile weather probe) + temporal context. Insect-inspired multimodal
 fusion (visual+olfactory, see ../fly-biomimicry) is a proven low-power pattern.
 
-> **Net Nzi narrative:** *"Calibrated, energy-efficient, distributed probabilistic nowcasting that
+> **Net TINA-X narrative:** *"Calibrated, energy-efficient, distributed probabilistic nowcasting that
 > improves reliability and lead time"* — symbolic constraints + thermodynamic sampling + swarm
 > sensor fusion. This is a genuinely novel stack (nobody has connected all three for nowcasting yet
 > — that gap IS the opportunity).

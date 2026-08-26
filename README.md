@@ -1,29 +1,29 @@
-# Project Nzi — MeTTa reasoning for resilient autonomous systems
+# Project TINA-X — MeTTa reasoning for resilient autonomous systems
 
-> **Nzi** means “fly” in Swahili. The fly is our control-system inspiration, not the product boundary. Project Nzi is a MeTTa/Hyperon-centered research project that gives autonomous agents a symbolic reasoning and verification layer, then connects that layer to fast control, decentralized swarms, agriculture, weather, and infrastructure-resilience applications.
+> **TINA-X** means “fly” in Swahili. The fly is our control-system inspiration, not the product boundary. Project TINA-X is a MeTTa/Hyperon-centered research project that gives autonomous agents a symbolic reasoning and verification layer, then connects that layer to fast control, decentralized swarms, agriculture, weather, and infrastructure-resilience applications.
 
 ## The one-sentence pitch
 
-**Nzi turns MeTTa rules into an auditable supervisory brain for autonomous systems: the symbolic layer proposes and explains a decision, a typed Rust gate verifies it, and a fast reflex loop executes it without allowing slow inference to destabilize control.**
+**TINA-X turns MeTTa rules into an auditable supervisory brain for autonomous systems: the symbolic layer proposes and explains a decision, a typed Rust gate verifies it, and a fast reflex loop executes it without allowing slow inference to destabilize control.**
 
 This is the part judges should evaluate first. The robotics, fly biomimicry, weather, agriculture, and TINA-X work are applications and research tracks built around the same thesis: **learned or sensed signals are not enough when a system must reason about constraints, dependencies, exceptions, and novel combinations of events.**
 
 ## Why this is a MeTTa/Hyperon project
 
-Hyperon’s Atomspace is a dynamic metagraph for representing knowledge, while MeTTa combines functional, logical, and process-calculus ideas and operates by querying and rewriting Atomspaces [1]. Nzi uses those properties directly rather than mentioning MeTTa as a decorative AI label.
+Hyperon’s Atomspace is a dynamic metagraph for representing knowledge, while MeTTa combines functional, logical, and process-calculus ideas and operates by querying and rewriting Atomspaces [1]. TINA-X uses those properties directly rather than mentioning MeTTa as a decorative AI label.
 
 The repository contains executable MeTTa rules and bridges for:
 
-| MeTTa/Hyperon contribution | What is implemented in Nzi | Why it matters |
+| MeTTa/Hyperon contribution | What is implemented in TINA-X | Why it matters |
 |---|---|---|
 | **Typed symbolic brain seam** | `rust-core` defines `SymbolicBrain`, `MettaQuery`, `MettaResult`, a production `SubprocessBrain`, and a `FakeBrain` test double. | Rust control logic can be tested independently of a moving Hyperon runtime while still driving real MeTTa end to end. |
 | **Two-rate reasoning architecture** | MeTTa/Hyperon runs in a slow supervisory loop; the allocation-free Rust reflex loop remains separate. | A symbolic decision can be explainable without putting millisecond-to-second inference inside a high-rate control path. |
 | **Rule-based verification** | Agriculture “treat/don’t treat,” hazard guidance, quorum/cross-inhibition, supervisor gates, and decision metadata are represented as symbolic rules. | The system can expose the rule and facts behind an action instead of returning only an opaque score. |
-| **Atomspace scalability discipline** | Benchmarks and `HotWorkingSpace` enforce a small working space and discourage naive full-space scans. | Nzi turns an observed Hyperon performance risk into an explicit architectural decision. |
+| **Atomspace scalability discipline** | Benchmarks and `HotWorkingSpace` enforce a small working space and discourage naive full-space scans. | TINA-X turns an observed Hyperon performance risk into an explicit architectural decision. |
 | **Novel-event reasoning** | TINA-X loads infrastructure dependencies into a MeTTa Atomspace and forward-chains cascading failures from compound scenarios. | The demo shows why symbolic composition is useful for events that were not present as a training example. |
 | **Cross-domain reuse** | The same symbolic pattern is applied to agriculture, weather guidance, swarm coordination, and infrastructure resilience. | The project demonstrates a reusable MeTTa reasoning substrate, not a single fly-only toy. |
 
-The official Hyperon project describes the ecosystem as active pre-alpha software and experimentation [2]. Nzi therefore labels what is measured, what is a proof of concept, and what remains aspirational instead of presenting the whole roadmap as production-ready.
+The official Hyperon project describes the ecosystem as active pre-alpha software and experimentation [2]. TINA-X therefore labels what is measured, what is a proof of concept, and what remains aspirational instead of presenting the whole roadmap as production-ready.
 
 ## The judge-facing demo
 
@@ -60,7 +60,7 @@ python3 -m venv .venv-tina
 
 If Rust and Node are installed, run the complete software demo described in [`docs/DEV_SETUP.md`](./docs/DEV_SETUP.md). The frontend is a mission-control view of telemetry and slow-brain decisions; it is not the reasoning engine itself.
 
-## What Nzi is—and is not
+## What TINA-X is—and is not
 
 | It is | It is not yet |
 |---|---|
@@ -84,7 +84,7 @@ The primary application prototype uses symbolic constraints to decide whether a 
 
 ### 3. TINA-X infrastructure resilience
 
-[`tina-x/`](./tina-x/) is an **independent component**, not merely a fly application. It reasons over infrastructure dependencies—power, hospitals, roads, fuel, and other services—and derives cascading failures from compound “black swan” scenarios. It can optionally send alerts to the Nzi dashboard, but it does not require Nzi to run.
+[`tina-x/`](./tina-x/) is an **independent component**, not merely a fly application. It reasons over infrastructure dependencies—power, hospitals, roads, fuel, and other services—and derives cascading failures from compound “black swan” scenarios. It can optionally send alerts to the TINA-X dashboard, but it does not require TINA-X to run.
 
 ### 4. Self-organizing swarms
 
@@ -138,9 +138,9 @@ docs/                         setup, ADRs, benchmarks, and audit notes
 
 ## Hackathon verdict: promising, but not yet a winner by default
 
-**Nzi can be competitive in a MeTTa/Hyperon hackathon, but the current breadth is a liability unless the submission is framed around one undeniable symbolic demo.** The winning argument is not “we built autonomous fly swarms.” It is:
+**TINA-X can be competitive in a MeTTa/Hyperon hackathon, but the current breadth is a liability unless the submission is framed around one undeniable symbolic demo.** The winning argument is not “we built autonomous fly swarms.” It is:
 
-> **Nzi demonstrates how MeTTa can sit above real-time agents as an auditable, reusable reasoning layer, and it proves the pattern across a safety gate, a novel infrastructure cascade, and decentralized coordination.**
+> **TINA-X demonstrates how MeTTa can sit above real-time agents as an auditable, reusable reasoning layer, and it proves the pattern across a safety gate, a novel infrastructure cascade, and decentralized coordination.**
 
 The project currently earns credibility from executable rules, a Rust↔MeTTa bridge, benchmarks, tests, and clear limitations. It loses points when agriculture, weather, ZK, Unity, Robonomics, and fly biology appear as equal priorities. Judges should not have to infer the MeTTa contribution from a large repository.
 
@@ -150,7 +150,7 @@ See [`docs/HACKATHON_GRILL.md`](./docs/HACKATHON_GRILL.md) for the adversarial q
 
 ## Status and limitations
 
-This is an open research prototype. Hyperon is an active pre-alpha ecosystem [2]. Nzi’s own benchmarks are local measurements, not vendor guarantees; the MeTTa subprocess bridge is a deliberate Phase-0 integration seam; Unity, hardware, Robonomics, large-scale deployment, and field validation are not complete. The project is strongest when it shows the evidence and the boundary of each claim.
+This is an open research prototype. Hyperon is an active pre-alpha ecosystem [2]. TINA-X’s own benchmarks are local measurements, not vendor guarantees; the MeTTa subprocess bridge is a deliberate Phase-0 integration seam; Unity, hardware, Robonomics, large-scale deployment, and field validation are not complete. The project is strongest when it shows the evidence and the boundary of each claim.
 
 ## References
 
@@ -161,4 +161,4 @@ This is an open research prototype. Hyperon is an active pre-alpha ecosystem [2]
 
 ## Contributing and license
 
-We welcome MeTTa developers, symbolic-AI researchers, Rust engineers, robotics and ML practitioners, weather scientists, and Web4 builders. Every new subsystem should identify the MeTTa rule, interface, benchmark, or application claim it adds. Project Nzi is MIT licensed.
+We welcome MeTTa developers, symbolic-AI researchers, Rust engineers, robotics and ML practitioners, weather scientists, and Web4 builders. Every new subsystem should identify the MeTTa rule, interface, benchmark, or application claim it adds. Project TINA-X is MIT licensed.

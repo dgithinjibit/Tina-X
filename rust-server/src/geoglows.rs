@@ -8,7 +8,7 @@
 //! wire end-to-end, and the research names it the first bridge to build.
 //!
 //! This module turns a set of river-reach forecasts into a normalized **flood-risk grid** that the
-//! swarm consumes as a [`nzi_swarm::hazard::HazardField`], so coverage concentrates where flooding
+//! swarm consumes as a [`tina_swarm::hazard::HazardField`], so coverage concentrates where flooding
 //! is forecast. The mapping is pure, deterministic, and unit-testable — no async, no HTTP — exactly
 //! like [`crate::sim`]. It mirrors the `/api/quorum` discipline: the endpoint always returns
 //! something honest and offline (`source: "fixture"`), and a live fetch is an explicit opt-in that
@@ -19,7 +19,7 @@
 //! level is a normalized proxy (forecast discharge vs. the reach's return-period threshold), not a
 //! calibrated probability; the DTO labels its `source` so the dashboard never overclaims.
 
-use nzi_swarm::hazard::{HazardField, DEFAULT_HAZARD_BIAS};
+use tina_swarm::hazard::{HazardField, DEFAULT_HAZARD_BIAS};
 
 /// One river-reach streamflow forecast, mapped onto the coverage grid. Mirrors the fields we need
 /// from a GEOGLOWS reach: a grid cell, the forecast peak discharge, and the reach's warning

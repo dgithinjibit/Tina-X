@@ -7,7 +7,7 @@
 //! In a live system the values are driven by a real Earth-Observation feed: **GEOGLOWS ECMWF
 //! Streamflow v2** (free, no-auth) gives a 15-day river-discharge forecast, which the server maps
 //! onto the grid as a normalized flood-risk level per cell. This crate stays dependency-free and
-//! feed-agnostic: it just holds the grid of risk levels; the `nzi-server` `geoglows` module fills
+//! feed-agnostic: it just holds the grid of risk levels; the `tina-server` `geoglows` module fills
 //! it from the real feed (or an offline fixture). That mirrors how `stigmergy` stays pure while the
 //! orchestrator drives it.
 //!

@@ -1,7 +1,7 @@
 # MeTTa/Hyperon Baseline Benchmarks
 
 > **Why this file exists:** verified research found NO published latency/throughput numbers
-> for Hyperon/MeTTa. Every real-time architecture decision in Nzi must cite a number we
+> for Hyperon/MeTTa. Every real-time architecture decision in TINA-X must cite a number we
 > measured ourselves. This is the living record. (ROADMAP P0.3)
 
 ## Environment

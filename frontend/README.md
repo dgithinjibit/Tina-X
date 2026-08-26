@@ -1,12 +1,12 @@
-# Nzi Mission Control (React + TypeScript)
+# TINA-X Mission Control (React + TypeScript)
 
-The landing + dashboard page hackathon judges / YC can open to *verify* Project Nzi is real:
+The landing + dashboard page hackathon judges / YC can open to *verify* Project TINA-X is real:
 live reflex telemetry, the two-rate-brain explanation, and the IoT bill of materials.
 
 ## Run it
 ```bash
 # 1. Start the Rust API (in the repo root):
-cargo run -p nzi-server            # serves http://127.0.0.1:8080
+cargo run -p tina-server            # serves http://127.0.0.1:8080
 
 # 2. Start the frontend (in this folder):
 npm install

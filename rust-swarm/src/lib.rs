@@ -1,4 +1,4 @@
-//! Project Nzi — headless **SoNS swarm** (Phase 4).
+//! Project TINA-X — headless **SoNS swarm** (Phase 4).
 //!
 //! Scale from one bot to a fleet using a **Self-organizing Nervous System (SoNS)**: a hierarchy
 //! that forms at runtime from purely **neighbor-local** interactions, with an interchangeable
@@ -230,7 +230,7 @@ impl Swarm {
 
     /// Neighbor-local **support/inhibition tallies** for each leader candidate — the cheap swarm
     /// signal the honeybee quorum arbiter deliberates over (bee brain B1–B4; see
-    /// `nzi_core::quorum`). "Which brain does the group commit to?" is a quorum decision, and this
+    /// `tina_core::quorum`). "Which brain does the group commit to?" is a quorum decision, and this
     /// is the raw evidence for it.
     ///
     /// For every id that at least one alive agent currently believes leads:
@@ -246,7 +246,7 @@ impl Swarm {
     ///
     /// This is an INSPECTION helper (it aggregates global belief for an external arbiter); no agent
     /// reads it. It is plain data — the caller maps each `(id, support, inhibition)` to a
-    /// `nzi_core::quorum::Tally` (the swarm crate stays dependency-free).
+    /// `tina_core::quorum::Tally` (the swarm crate stays dependency-free).
     pub fn candidate_tallies(&self) -> Vec<CandidateTally> {
         // Tally believed-leader ids across alive agents.
         let mut believers: std::collections::BTreeMap<AgentId, u32> = std::collections::BTreeMap::new();
@@ -356,8 +356,8 @@ pub struct SwarmSnapshot {
 }
 
 /// A leader candidate's neighbor-local support/inhibition tally — the swarm-native evidence the
-/// honeybee quorum arbiter (`nzi_core::quorum`) deliberates over. Plain data: the caller maps it to
-/// a `nzi_core::quorum::Tally` (keeping this crate dependency-free).
+/// honeybee quorum arbiter (`tina_core::quorum`) deliberates over. Plain data: the caller maps it to
+/// a `tina_core::quorum::Tally` (keeping this crate dependency-free).
 #[derive(Clone, Copy, Debug, PartialEq, Eq)]
 pub struct CandidateTally {
     /// The candidate leader's agent id.

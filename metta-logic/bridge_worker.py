@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""Project Nzi — MeTTa bridge worker (called by the Rust SubprocessBrain).
+"""Project TINA-X — MeTTa bridge worker (called by the Rust SubprocessBrain).
 
 WHAT THIS IS (for a junior dev):
   The Rust "slow brain" needs to ask MeTTa questions. Rust cannot (yet) link the MeTTa

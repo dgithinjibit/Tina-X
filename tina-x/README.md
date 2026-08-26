@@ -1,7 +1,7 @@
 # 🌍 TINA-X — a Digital Twin of Society's Fragility
 
-> **TINA-X is an independent component of Project Nzi** (see `../docs/adr/0005-...`). You can work
-> on and run it *without* the rest of Nzi. It can optionally push alerts to the Nzi dashboard, but
+> **TINA-X is an independent component of Project TINA-X** (see `../docs/adr/0005-...`). You can work
+> on and run it *without* the rest of TINA-X. It can optionally push alerts to the TINA-X dashboard, but
 > never requires it.
 
 ## What it is
@@ -43,9 +43,9 @@ tina-x/
 │   ├── engine.py          # loads MeTTa, injects events, queries failures
 │   ├── scenarios.py       # named "black swan" events (quake, typhoon, solar flare, combos)
 │   ├── demo.py            # runnable end-to-end demo
-│   └── bridge.py          # OPTIONAL: push alerts to the Nzi dashboard (no-op if Nzi absent)
+│   └── bridge.py          # OPTIONAL: push alerts to the TINA-X dashboard (no-op if TINA-X absent)
 └── tests/                 # pytest
 ```
 
 ## Boundary (the rule that keeps it independent)
-TINA-X may **send** alerts to Nzi over HTTP/JSON; it must never **require** Nzi. See ADR 0005.
+TINA-X may **send** alerts to TINA-X over HTTP/JSON; it must never **require** TINA-X. See ADR 0005.

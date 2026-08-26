@@ -1,4 +1,4 @@
-; Project Nzi — MISSION facts + the setpoint decision rule (P2.4).
+; Project TINA-X — MISSION facts + the setpoint decision rule (P2.4).
 ; The mission GOAL is expressed as a desired attitude-rate target per mode. `decide-setpoint`
 ; is the slow brain's reasoning entry point: given the current mission mode and the latest
 ; telemetry, it PROPOSES a setpoint. The Rust supervisor then runs that proposal through the

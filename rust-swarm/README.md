@@ -35,6 +35,6 @@ distance-vector routing protocols use to bound count-to-infinity). See `docs/adr
 
 ## Run
 ```bash
-cargo run -p nzi-swarm --bin swarm-demo   # self-organize -> cover -> kill brain -> self-heal
-cargo test -p nzi-swarm
+cargo run -p tina-swarm --bin swarm-demo   # self-organize -> cover -> kill brain -> self-heal
+cargo test -p tina-swarm
 ```

@@ -1,9 +1,9 @@
-# Bee + Ant collective-decision mechanisms → Nzi brain upgrades
+# Bee + Ant collective-decision mechanisms → TINA-X brain upgrades
 
 > Deep-research run 2026-08-09 (105 agents, 23 sources, 24/25 claims adversarially confirmed).
 > Scope: enrich the SLOW MeTTa brain + swarm layer with honeybee (quorum, cross-inhibition) and
 > ant (stigmergy/ACO, response-thresholds) mechanisms. This doc is the design map we implement
-> against; every mechanism names the existing Nzi component it extends and whether it belongs in
+> against; every mechanism names the existing TINA-X component it extends and whether it belongs in
 > the FAST Rust loop or the SLOW MeTTa brain.
 
 ## The one-line split (design rule)
@@ -38,7 +38,7 @@ breaks deadlock over equal options AND reduces "split" decisions **without impai
 - **Extends:** `rust-swarm::sons` gossip (emit the cheap directed token) + slow MeTTa arbitration.
 - **Rule shape:** `recruit-weight(o) = max(0, base-support(o) - inhibition-received(o))`;
   `inhibit(me, other) = if option(me) != option(other) then send-stop(other)`.
-- Why it matters for Nzi: current SoNS max-consensus (highest-id-wins) is deterministic but
+- Why it matters for TINA-X: current SoNS max-consensus (highest-id-wins) is deterministic but
   **arbitrary**; cross-inhibition adds a **value-sensitive** deadlock-breaker for equal-value targets.
 
 ### B4. Inhibition gain is a bifurcation parameter, coupled to quorum (SLOW / MeTTa) — *implemented*
@@ -72,7 +72,7 @@ ACO math (Dorigo & Stützle, Scholarpedia + monograph): transition
 ### A2. Evaporation is "useful forgetting" — ESSENTIAL for adaptivity (FAST / Rust) — *implemented*
 Scholarpedia: evaporation "favors exploration of new areas." S-ACO: with **ρ=0 the algorithm does
 not converge** (stuck); ρ=0.01–0.1 works.
-- **Direct Nzi consequence:** our monotonic `CoverageField` **IS the broken ρ=0 case** — covered
+- **Direct TINA-X consequence:** our monotonic `CoverageField` **IS the broken ρ=0 case** — covered
   cells stay hot forever, so the field can't re-adapt to re-infestation, re-treatment need, or a
   downed agent's zone going stale. `evaporate(ρ)` makes coverage self-heal and re-flow to gaps —
   the mechanism behind our own P4.4 resilience goal. ρ is tuned (too high hurts convergence, too low
@@ -94,7 +94,7 @@ task when its stimulus exceeds the agent's threshold; reinforced thresholds fall
    don't market biological fidelity.
 2. **Several results are model/simulation, not field data** — split-reduction, quality×distance
    reversal, pitchfork bifurcation, "natural-selection-tuned quorum." Numbers are directional.
-3. **Bio numbers don't transfer directly** — quorum ~10–20 bees is a *ratio to steal*; Nzi swarm
+3. **Bio numbers don't transfer directly** — quorum ~10–20 bees is a *ratio to steal*; TINA-X swarm
    sizes differ. ACO's ρ/α/β are hyperparameters with no biological value — **sweep them**.
 4. **Where it breaks down (the one refuted claim, 0-3):** "stigmergy alone explains
    self-organization" is overstated — real self-organization needs the *full loop* (deposit +
@@ -104,7 +104,7 @@ task when its stimulus exceeds the agent's threshold; reinforced thresholds fall
 5. **Response-thresholds (A3) unverified** — see above.
 
 ## Open questions (tracked)
-- Real quorum threshold + inhibition gain for Nzi's swarm sizes/risk levels → empirical sweep in the
+- Real quorum threshold + inhibition gain for TINA-X's swarm sizes/risk levels → empirical sweep in the
   headless swarm before deployment.
 - Can drones realize genuine stigmergy without a shared grid (RF beacons / visual markers / neighbor-
   local on-map pheromone)?

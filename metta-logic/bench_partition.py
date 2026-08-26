@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""Project Nzi — partitioned-Atomspace benchmark (P2.7, validates ADR 0002).
+"""Project TINA-X — partitioned-Atomspace benchmark (P2.7, validates ADR 0002).
 
 P0.3 proved the PROBLEM: direct `space.query()` over a flat GroundingSpace is ~O(n)
 (~2 s @100k, ~23 s @1M). ADR 0002's fix is to keep a TINY hot working-space and reach cold
@@ -128,7 +128,7 @@ def main() -> int:
 
     import hyperon  # type: ignore
     version = getattr(hyperon, "__version__", "unknown")
-    print(f"Project Nzi — partitioned-Atomspace benchmark (P2.7)  [hyperon {version}]")
+    print(f"Project TINA-X — partitioned-Atomspace benchmark (P2.7)  [hyperon {version}]")
     print("Validates ADR 0002: partitioned p99 stays flat while flat query() grows O(n).\n")
 
     sizes = [1_000, 100_000] if quick else [1_000, 100_000, 1_000_000]

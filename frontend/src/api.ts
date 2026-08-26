@@ -6,7 +6,7 @@
 
 /** Base URL of the Rust mission-control API. Overridable via Vite env for deploys. */
 export const API_BASE: string =
-  (import.meta as { env?: Record<string, string> }).env?.VITE_NZI_API ??
+  (import.meta as { env?: Record<string, string> }).env?.VITE_TINA_X_API ??
   "http://127.0.0.1:8080";
 
 /** WebSocket URL for live telemetry (derived from API_BASE). */

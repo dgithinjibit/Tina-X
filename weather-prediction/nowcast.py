@@ -1,4 +1,4 @@
-"""Project Nzi — harsh-weather nowcasting: synthetic data + probabilistic model (P5.1/P5.2).
+"""Project TINA-X — harsh-weather nowcasting: synthetic data + probabilistic model (P5.1/P5.2).
 
 DESIGN MANDATE (see weather-prediction/README.md): we target CALIBRATED PROBABILISTIC SKILL and
 report honest scores (Brier, reliability, ETS, lead time). We NEVER ship a "99% accurate" claim —

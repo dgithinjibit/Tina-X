@@ -1,4 +1,4 @@
-; Project Nzi — WORLD facts (P2.4, supervisory-loop knowledge base).
+; Project TINA-X — WORLD facts (P2.4, supervisory-loop knowledge base).
 ; What the agent knows about its ENVIRONMENT and its own physical envelope. These are the
 ; ground truths the slow brain reasons over when proposing a setpoint. They are deliberately the
 ; SAME constants the verification checks enforce (limits.metta) so a proposal the brain makes is

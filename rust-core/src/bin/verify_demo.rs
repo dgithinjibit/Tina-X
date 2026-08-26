@@ -6,10 +6,10 @@
 //! types, printing the verdict for each. You should see the good one Approved and every bad one
 //! Rejected, naming the check that caught it.
 //!
-//! Run:  cargo run -p nzi-core --bin verify-demo
+//! Run:  cargo run -p tina-core --bin verify-demo
 //! (Requires the venv from docs/DEV_SETUP.md; otherwise it prints a friendly setup hint.)
 
-use nzi_core::verify::{Context, Gate, Setpoint};
+use tina_core::verify::{Context, Gate, Setpoint};
 use std::path::PathBuf;
 
 fn project_root() -> PathBuf {
@@ -31,7 +31,7 @@ fn good_ctx() -> Context {
 }
 
 fn main() {
-    println!("Project Nzi — action-gate demo (Phase 2, verification moat)");
+    println!("Project TINA-X — action-gate demo (Phase 2, verification moat)");
 
     let root = project_root();
     let gate = match Gate::from_project_root(&root) {

@@ -17,8 +17,8 @@ and compared them head-to-head.
 | Measured perf | setup 431 ms, **prove 161 ms, verify 3.5 ms** | tests pass; gas est. ~800–1200 per call |
 | Hides private `wind`? | ✅ verifier sees only (tolerance, decision) | ✅ by design at the prover boundary |
 | Lying prover blocked? | ✅ cannot produce a valid proof | ✅ validator rejects inconsistent decision |
-| Language / integration | Same Rust as `nzi-core`; one toolchain | Separate language + 35 MB Scarb toolchain |
-| Tests | 5 unit + doctest (`cargo test -p nzi-zk-rust`) | 5 (`scarb cairo-test`) |
+| Language / integration | Same Rust as `tina-core`; one toolchain | Separate language + 35 MB Scarb toolchain |
+| Tests | 5 unit + doctest (`cargo test -p tina-zk-rust`) | 5 (`scarb cairo-test`) |
 | On-chain / Robonomics fit | needs a verifier contract (BN254 verify is cheap & EVM-friendly) | **native** to Starknet |
 | Trusted setup | ⚠️ yes (Groth16 per-circuit) | ✅ none (STARK) |
 
@@ -38,7 +38,7 @@ language as long as the project runs, software-first"): Rust "works best" for *b
 Cairo wins for *on-chain later*. We don't have to choose one forever — we sequence them.
 
 ## Consequences
-- (+) ZK development stays in the workspace (`cargo test` covers it); tight loop with `nzi-core`.
+- (+) ZK development stays in the workspace (`cargo test` covers it); tight loop with `tina-core`.
 - (+) Groth16's ~3.5 ms verify is ideal for a cheap on-chain/edge verifier.
 - (−) Groth16 needs a per-circuit trusted setup — acceptable for a POC; revisit (PLONK/STARK) if
   circuits change often or trusted setup becomes a liability.
@@ -46,7 +46,7 @@ Cairo wins for *on-chain later*. We don't have to choose one forever — we sequ
   are tiny and test the identical rule; a drift test can be added when it matters.
 
 ## Validation
-- `cargo run -p nzi-zk-rust --release` prints prove/verify timings and a valid=true roundtrip.
+- `cargo run -p tina-zk-rust --release` prints prove/verify timings and a valid=true roundtrip.
 - `scarb cairo-test` (in `zk-cairo/`) passes the same rule's tests.
 - Next ZK statement (e.g. "decision came from the signed MeTTa ruleset") is prototyped in
   `zk-rust` first, per this ADR.

@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""Project Nzi — MeTTa/Hyperon smoke test harness (P0.2).
+"""Project TINA-X — MeTTa/Hyperon smoke test harness (P0.2).
 
 Loads `smoke_test.metta`, runs it through the Hyperon MeTTa interpreter, and prints
 the results. This is the first proof that our symbolic layer works end-to-end.
@@ -33,7 +33,7 @@ def main() -> int:
     except Exception:
         version = "unknown"
 
-    print(f"Project Nzi — MeTTa smoke test (hyperon {version})")
+    print(f"Project TINA-X — MeTTa smoke test (hyperon {version})")
 
     src = SMOKE.read_text()
     metta = MeTTa()

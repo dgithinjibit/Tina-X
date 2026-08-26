@@ -1,4 +1,4 @@
-# Scene setup — one Nzi agent (Phase 1.1)
+# Scene setup — one TINA-X agent (Phase 1.1)
 
 Step-by-step to build the minimal scene in the Unity editor. Assumes Unity **2022 LTS** or newer
 and the **ML-Agents** package installed (Window ▸ Package Manager ▸ add `com.unity.ml-agents`).
@@ -7,11 +7,11 @@ and the **ML-Agents** package installed (Window ▸ Package Manager ▸ add `com
 > (Phase 1.2), then press Play. Without it, the agent free-falls (by design — crash tolerant).
 
 ## 1. The agent body
-1. Create an empty GameObject, name it `NziAgent`.
+1. Create an empty GameObject, name it `TinaXAgent`.
 2. Add a child mesh (a `Cube` or a simple quad-rotor model) so you can see its attitude.
-3. On `NziAgent` add:
+3. On `TinaXAgent` add:
    - **Rigidbody** — uncheck *Use Gravity* for a pure attitude test first; enable it later.
-   - **NziAgent.cs** (this scaffold) — set `Host`/`Port` to match the Rust server (`127.0.0.1:8765`).
+   - **TinaXAgent.cs** (this scaffold) — set `Host`/`Port` to match the Rust server (`127.0.0.1:8765`).
    - **Behavior Parameters** (from ML-Agents) — leave the model empty for Phase 1; we drive via
      the bridge, not a trained policy.
 
@@ -26,7 +26,7 @@ and the **ML-Agents** package installed (Window ▸ Package Manager ▸ add `com
   change it, but 500 Hz keeps sim and hardware assumptions aligned.
 
 ## 4. Axis mapping (IMPORTANT)
-`NziAgent.cs` assumes **roll = z, pitch = x, yaw = y** in Unity's left-handed frame. If your
+`TinaXAgent.cs` assumes **roll = z, pitch = x, yaw = y** in Unity's left-handed frame. If your
 model's forward/up axes differ, fix the two mapping lines in `FixedUpdate` (marked with the
 convention comment) — get this wrong and the agent will fight itself. Verify by nudging one axis
 and confirming only that axis's command responds.

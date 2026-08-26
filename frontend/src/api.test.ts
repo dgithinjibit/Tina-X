@@ -7,7 +7,7 @@ describe("wsUrl", () => {
     expect(wsUrl("http://127.0.0.1:8080")).toBe("ws://127.0.0.1:8080/ws");
   });
   it("converts https -> wss", () => {
-    expect(wsUrl("https://nzi.example.com")).toBe("wss://nzi.example.com/ws");
+    expect(wsUrl("https://tina.example.com")).toBe("wss://tina.example.com/ws");
   });
 });
 

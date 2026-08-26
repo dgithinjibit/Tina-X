@@ -1,8 +1,8 @@
-//! Telemetry: the structured data an Nzi agent emits so humans (and the dashboard) can see
+//! Telemetry: the structured data an TINA-X agent emits so humans (and the dashboard) can see
 //! what it's doing. These types are the CONTRACT between the agent and the frontend.
 //!
 //! # For a junior dev
-//! We keep these types in `nzi-core` (not the server) because the *agent* produces them. They
+//! We keep these types in `tina-core` (not the server) because the *agent* produces them. They
 //! derive `Serialize`/`Deserialize` so they become JSON automatically for the WebSocket/HTTP API.
 //! Keep them small and stable — the React app depends on their field names.
 
@@ -75,7 +75,7 @@ pub struct BrainDecision {
 /// A coarse health/status snapshot of one agent, for the dashboard's agent list.
 #[derive(Clone, Debug, PartialEq, Serialize, Deserialize)]
 pub struct AgentStatus {
-    /// Agent identifier, e.g. "nzi-001".
+    /// Agent identifier, e.g. "tina-001".
     pub agent_id: String,
     /// True while the reflex loop is stable and within budget.
     pub healthy: bool,

@@ -4,9 +4,9 @@
 //! self-healing, coverage, scale — from ONLY neighbor-local rules. They are the proof that the
 //! coordination is verified, not "emergent-and-hoped".
 
-use nzi_swarm::sons::MAX_HORIZON;
-use nzi_swarm::stigmergy::SERVICE_TARGET;
-use nzi_swarm::Swarm;
+use tina_swarm::sons::MAX_HORIZON;
+use tina_swarm::stigmergy::SERVICE_TARGET;
+use tina_swarm::Swarm;
 
 /// Ticks to drive cumulative coverage to the service target. Under pheromone evaporation an agent
 /// keeps depositing until its cell's decaying trail holds at target, so reaching a cumulative
@@ -147,7 +147,7 @@ fn stigmergy_re_covers_stale_cells_thanks_to_evaporation() {
 
     // Sanity: with ZERO evaporation the same scenario does NOT re-cover (proves decay is the cause).
     // We can't change a running swarm's ρ, so assert the field-level invariant directly instead.
-    let mut frozen = nzi_swarm::stigmergy::CoverageField::with_evaporation(1, 1, 0.0);
+    let mut frozen = tina_swarm::stigmergy::CoverageField::with_evaporation(1, 1, 0.0);
     for _ in 0..10 {
         frozen.mark(0, 0);
     }

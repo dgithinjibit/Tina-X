@@ -1,6 +1,6 @@
 # `metta-logic/verification/` — the verification moat (P2.1)
 
-This is Project Nzi's **defensibility**: before the slow brain's proposed action reaches the
+This is Project TINA-X's **defensibility**: before the slow brain's proposed action reaches the
 reflex/actuator layer, it is run through symbolic checks that catch the five well-known
 **agent-hallucination types**. An action that fails any check is *rejected with a reason* — the
 agent refuses to act rather than acting confidently-but-wrong.
@@ -44,7 +44,7 @@ verified against a **context** describing the current situation:
 
 ## How it runs
 
-`verify.metta` is the preamble; the Rust action-gate (`nzi-core`, P2.2) appends one
+`verify.metta` is the preamble; the Rust action-gate (`tina-core`, P2.2) appends one
 `!(gate-setpoint ...)` line and sends the whole program to MeTTa through the `SubprocessBrain`
 seam (ADR 0003). The safety-critical gate decision stays in Rust; only the *reasoning* is
 delegated to the MeTTa engine.

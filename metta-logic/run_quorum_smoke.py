@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""Project Nzi — bee quorum + cross-inhibition smoke test (bee brain upgrade B1-B4).
+"""Project TINA-X — bee quorum + cross-inhibition smoke test (bee brain upgrade B1-B4).
 
 Loads metta-logic/knowledge/quorum.metta and asserts the collective-decision rule behaves:
   * below quorum -> Scout (no blind commit — fail-safe);
@@ -68,11 +68,11 @@ def main() -> int:
         return 1
 
     base = preamble()
-    print("Project Nzi — bee quorum + cross-inhibition smoke test")
+    print("Project TINA-X — bee quorum + cross-inhibition smoke test")
     failures = 0
 
     for label, risk, first, rest, expected in CASES:
-        metta = MeTTa()  # fresh space per case (never reuse — see nzi-metta-gotchas #6)
+        metta = MeTTa()  # fresh space per case (never reuse — see tina-metta-gotchas #6)
         ctx = f"(qctx (risk {risk}))"
         query = f"{base}\n!(decide-quorum {ctx} {first} {cons_list(rest)})"
         results = metta.run(query)[-1]

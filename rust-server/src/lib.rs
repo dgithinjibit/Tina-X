@@ -1,4 +1,4 @@
-//! Project Nzi mission-control server library.
+//! Project TINA-X mission-control server library.
 //!
 //! Splits into:
 //! - [`sim`]      — a testable live reflex simulation producing telemetry (no async).

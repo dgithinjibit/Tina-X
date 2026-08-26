@@ -1,13 +1,13 @@
 //! zk-rust demo — prove & verify a safe-to-fly decision, and time it (for ADR 0004).
 //!
-//! Run:  cargo run -p nzi-zk-rust --release
+//! Run:  cargo run -p tina-zk-rust --release
 //! (Release matters: ZK proving is MUCH faster optimized.)
 
-use nzi_zk_rust::{safe_to_fly, SafeToFlyZk};
+use tina_zk_rust::{safe_to_fly, SafeToFlyZk};
 use std::time::Instant;
 
 fn main() {
-    println!("Project Nzi — Rust-native ZK POC (arkworks Groth16 / BN254)");
+    println!("Project TINA-X — Rust-native ZK POC (arkworks Groth16 / BN254)");
 
     // A realistic scenario: private wind 8 m/s + AUTHENTICATED (OSNMA) position, public tolerance
     // 12 m/s -> decision "fly" (1). Fly needs BOTH safe wind AND authenticated signals (bridge #1).

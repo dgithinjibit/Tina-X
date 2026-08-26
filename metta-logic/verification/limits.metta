@@ -1,4 +1,4 @@
-; Project Nzi — shared physical limits & helpers for the verification checks (P2.1)
+; Project TINA-X — shared physical limits & helpers for the verification checks (P2.1)
 ; These are the tunable constants the five checks reference. Keeping them in one place means
 ; a junior dev changes a limit HERE, not scattered across five files.
 

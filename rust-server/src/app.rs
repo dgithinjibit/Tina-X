@@ -19,13 +19,13 @@ use axum::extract::ws::{Message, WebSocket, WebSocketUpgrade};
 use axum::response::IntoResponse;
 use axum::routing::{get, post};
 use axum::{Json, Router};
-use nzi_core::telemetry::TelemetryMsg;
+use tina_core::telemetry::TelemetryMsg;
 use serde::{Deserialize, Serialize};
 use std::time::Duration;
 use tower_http::cors::CorsLayer;
 
-use nzi_core::quorum::{QuorumArbiter, QuorumVerdict, Risk, Tally};
-use nzi_swarm::{stigmergy::SERVICE_TARGET, Swarm, SwarmSnapshot};
+use tina_core::quorum::{QuorumArbiter, QuorumVerdict, Risk, Tally};
+use tina_swarm::{stigmergy::SERVICE_TARGET, Swarm, SwarmSnapshot};
 
 use crate::bom::reference_bom;
 use crate::geoglows::{flood_scenario, FloodForecast};
@@ -52,14 +52,14 @@ async fn health() -> impl IntoResponse {
     Json(serde_json::json!({ "status": "ok" }))
 }
 
-/// Serve the bill of materials for one Nzi agent.
+/// Serve the bill of materials for one TINA-X agent.
 async fn bom() -> impl IntoResponse {
     Json(reference_bom())
 }
 
 /// Serve a one-shot status snapshot (spins the sim a few steps so the numbers are non-trivial).
 async fn status() -> impl IntoResponse {
-    let mut sim = AgentSim::new("nzi-001", 1.0 / 500.0);
+    let mut sim = AgentSim::new("tina-001", 1.0 / 500.0);
     for _ in 0..10 {
         sim.tick();
     }
@@ -72,7 +72,7 @@ async fn status() -> impl IntoResponse {
 // stigmergic coverage field (with pheromone that evaporates — the ant "useful forgetting"). We run
 // a small swarm a fixed number of steps so it has converged and covered, then serialize a snapshot.
 
-/// Serializable DTO mirroring `nzi_swarm::SwarmSnapshot` (the swarm crate stays serde-free).
+/// Serializable DTO mirroring `tina_swarm::SwarmSnapshot` (the swarm crate stays serde-free).
 #[derive(Debug, Clone, Serialize)]
 pub struct SwarmView {
     pub width: usize,
@@ -144,7 +144,7 @@ async fn swarm() -> impl IntoResponse {
 //
 // Closes the loop between the two collective-intelligence layers: the swarm produces cheap
 // neighbor-local support/inhibition tallies for each leader CANDIDATE (`candidate_tallies`), and
-// the SLOW MeTTa quorum arbiter (`nzi_core::quorum`, driving quorum.metta) turns them into a
+// the SLOW MeTTa quorum arbiter (`tina_core::quorum`, driving quorum.metta) turns them into a
 // justified Commit/Scout verdict — the robotic analog of honeybee nest-site selection. We show
 // BOTH the raw tallies and the verdict so a judge can see the evidence and the decision.
 //
@@ -152,7 +152,7 @@ async fn swarm() -> impl IntoResponse {
 // errors) we degrade gracefully to `available: false` with a reason, rather than 500 — the endpoint
 // is honest about needing the venv, and the server test stays venv-free.
 
-/// One candidate's tally as shown to the dashboard (mirror of `nzi_swarm::CandidateTally`).
+/// One candidate's tally as shown to the dashboard (mirror of `tina_swarm::CandidateTally`).
 #[derive(Debug, Clone, Serialize)]
 pub struct CandidateView {
     pub id: u32,
@@ -307,7 +307,7 @@ impl FloodView {
         let mean_risk = forecast.mean_risk();
 
         // Attach the overlay to a swarm on the SAME grid and run it to coverage — the flood biases
-        // where effort goes (see nzi_swarm::hazard). This is the "swarm redirects to the flood" step.
+        // where effort goes (see tina_swarm::hazard). This is the "swarm redirects to the flood" step.
         let mut swarm = Swarm::grid(forecast.width, forecast.height).with_hazard(forecast.to_hazard_field());
         swarm.run(24);
         let coverage_fraction = swarm.snapshot(SERVICE_TARGET).coverage_fraction;
@@ -329,7 +329,7 @@ impl FloodView {
 ///
 /// Source selection is honest and fail-safe:
 ///   * Default → the built-in offline fixture (`source: "fixture"`), so the demo always works.
-///   * With the `live-feed` build feature AND `NZI_GEOGLOWS_LIVE=1` → fetch the REAL GEOGLOWS v2
+///   * With the `live-feed` build feature AND `TINA_X_GEOGLOWS_LIVE=1` → fetch the REAL GEOGLOWS v2
 ///     REST API (`source: "geoglows-live"`), degrading to the fixture if the fetch yields nothing
 ///     (network down, all reaches failed). The blocking HTTP call runs on a blocking thread so it
 ///     never stalls the async runtime.
@@ -343,7 +343,7 @@ async fn flood() -> impl IntoResponse {
 async fn resolve_forecast() -> FloodForecast {
     #[cfg(feature = "live-feed")]
     {
-        let live = std::env::var("NZI_GEOGLOWS_LIVE").is_ok_and(|v| v == "1" || v == "true");
+        let live = std::env::var("TINA_X_GEOGLOWS_LIVE").is_ok_and(|v| v == "1" || v == "true");
         if live {
             let (w, h) = crate::geoglows::FLOOD_GRID;
             let sites = crate::geoglows::default_sites();
@@ -369,7 +369,7 @@ async fn resolve_forecast() -> FloodForecast {
 // each valid fix onto the operating grid via a geographic bounding box. Honest: invalid/void fixes
 // are surfaced as such, never silently placed. Always 200 — the fixture is built in.
 
-/// One parsed GNSS fix as shown to the dashboard (mirror of `nzi_swarm::gnss::GnssFix` plus its
+/// One parsed GNSS fix as shown to the dashboard (mirror of `tina_swarm::gnss::GnssFix` plus its
 /// mapped grid cell). `cell` is null for an invalid fix (not placed on the grid).
 #[derive(Debug, Clone, Serialize)]
 pub struct GnssFixView {
@@ -396,7 +396,7 @@ pub struct GnssView {
 impl GnssView {
     /// Parse the fixture NMEA track and map it onto the given grid via the fixture bounds.
     fn from_fixture(width: usize, height: usize) -> Self {
-        use nzi_swarm::gnss::{GnssTrack, FIXTURE_BOUNDS, FIXTURE_NMEA};
+        use tina_swarm::gnss::{GnssTrack, FIXTURE_BOUNDS, FIXTURE_NMEA};
         let track = GnssTrack::from_nmea(FIXTURE_NMEA);
         let fixes = track
             .fixes
@@ -424,8 +424,8 @@ async fn gnss() -> impl IntoResponse {
 // --- TINA-X alert intake (OPTIONAL component integration; ADR 0005) --------------------------
 //
 // TINA-X is an INDEPENDENT component that may push cascade alerts here. This endpoint accepts
-// them so the Nzi dashboard can display societal-fragility warnings alongside agent telemetry.
-// Nzi does not depend on TINA-X; this endpoint simply exists for TINA-X to POST to if it wants.
+// them so the TINA-X dashboard can display societal-fragility warnings alongside agent telemetry.
+// TINA-X does not depend on TINA-X; this endpoint simply exists for TINA-X to POST to if it wants.
 
 /// One cascade alert coming from TINA-X (matches tina-x/tina_x/bridge.py's JSON).
 #[derive(Debug, Clone, Serialize, Deserialize)]
@@ -462,7 +462,7 @@ async fn ws_upgrade(ws: WebSocketUpgrade) -> impl IntoResponse {
 /// We deliberately DON'T stream at the full 500 Hz control rate — the human eye and the browser
 /// don't need it. ~30 Hz is smooth and light on the socket. (A real system would decimate.)
 async fn stream_telemetry(mut socket: WebSocket) {
-    let mut sim = AgentSim::new("nzi-001", 1.0 / 500.0);
+    let mut sim = AgentSim::new("tina-001", 1.0 / 500.0);
     let mut ticker = tokio::time::interval(Duration::from_millis(33)); // ~30 Hz
 
     loop {
@@ -490,7 +490,7 @@ async fn stream_telemetry(mut socket: WebSocket) {
 /// Bind to `addr` and serve forever. Called by the binary; not used in tests.
 pub async fn serve(addr: &str) -> std::io::Result<()> {
     let listener = tokio::net::TcpListener::bind(addr).await?;
-    println!("Nzi mission-control API listening on http://{addr}");
+    println!("TINA-X mission-control API listening on http://{addr}");
     println!("  GET /api/health  GET /api/bom  GET /api/status  GET /api/swarm  GET /api/quorum  GET /api/flood  GET /api/gnss  POST /api/alerts  WS /ws");
     axum::serve(listener, build_router()).await
 }

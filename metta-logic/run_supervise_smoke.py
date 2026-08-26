@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""Project Nzi — supervisory knowledge-base smoke test (P2.4).
+"""Project TINA-X — supervisory knowledge-base smoke test (P2.4).
 
 Loads the knowledge base (world + mission + agent) and asserts that `decide-setpoint` proposes a
 sensible, in-envelope setpoint for representative telemetry:
@@ -48,7 +48,7 @@ def main() -> int:
         return 1
 
     base = preamble()
-    print("Project Nzi — supervisory knowledge-base smoke test")
+    print("Project TINA-X — supervisory knowledge-base smoke test")
     failures = 0
 
     for label, telemetry, expected in CASES:

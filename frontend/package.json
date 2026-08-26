@@ -1,9 +1,9 @@
 {
-  "name": "nzi-mission-control",
+  "name": "tina-mission-control",
   "private": true,
   "version": "0.0.1",
   "type": "module",
-  "description": "Project Nzi mission-control + landing page (React + TypeScript). Shows live reflex telemetry, MeTTa decisions, and the IoT bill of materials.",
+  "description": "Project TINA-X mission-control + landing page (React + TypeScript). Shows live reflex telemetry, MeTTa decisions, and the IoT bill of materials.",
   "scripts": {
     "dev": "vite",
     "build": "tsc -b && vite build",

@@ -1,5 +1,5 @@
 //! Roofline analysis + profiling — the transferable ideas from the "How To Scale Your Model"
-//! book (jax-ml/scaling-book), adapted to Nzi's edge/symbolic regime.
+//! book (jax-ml/scaling-book), adapted to TINA-X's edge/symbolic regime.
 //!
 //! # For a junior dev: what is a "roofline"?
 //!
@@ -20,7 +20,7 @@
 //!   * intensity <  ridge  -> MEMORY-bound  (add compute won't help; move less data)
 //!   * intensity >= ridge  -> COMPUTE-bound (faster memory won't help; do less math)
 //!
-//! # Why this matters for Nzi (not just for TPUs)
+//! # Why this matters for TINA-X (not just for TPUs)
 //!
 //! The book targets LLMs on TPUs, but the *lens* is universal. Our own Phase-0 findings were
 //! secretly roofline results:

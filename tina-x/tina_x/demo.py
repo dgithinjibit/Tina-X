@@ -2,7 +2,7 @@
 
 Run:  .venv/bin/python -m tina_x.demo
       .venv/bin/python -m tina_x.demo --scenario quake-typhoon
-      .venv/bin/python -m tina_x.demo --nzi-url http://127.0.0.1:8080   # also push to Nzi (optional)
+      .venv/bin/python -m tina_x.demo --tina-url http://127.0.0.1:8080   # also push to TINA-X (optional)
 
 The headline result to look for: individually survivable events produce NO failures, but the
 COMPOUND event cascades into a hospital losing power — deduced, never trained on.
@@ -16,7 +16,7 @@ from .engine import TinaEngine
 from .scenarios import ALL
 
 
-def run_scenario(key: str, nzi_url: str | None = None) -> int:
+def run_scenario(key: str, tina_url: str | None = None) -> int:
     """Run one scenario end-to-end; returns the number of predicted failures."""
     scenario = ALL[key]
     print(f"\n=== {scenario.name} ===")
@@ -37,12 +37,12 @@ def run_scenario(key: str, nzi_url: str | None = None) -> int:
         for f in failures:
             print(f"       - {f.message()}")
 
-    # OPTIONAL: forward alerts to the Nzi dashboard. Never required (ADR 0005).
-    if nzi_url and failures:
+    # OPTIONAL: forward alerts to the TINA-X dashboard. Never required (ADR 0005).
+    if tina_url and failures:
         from .bridge import push_alerts
 
-        ok = push_alerts(failures, nzi_url, scenario.name)
-        print(f"    bridge: {'sent to Nzi' if ok else 'Nzi unreachable (ignored)'}")
+        ok = push_alerts(failures, tina_url, scenario.name)
+        print(f"    bridge: {'sent to TINA-X' if ok else 'TINA-X unreachable (ignored)'}")
 
     return len(failures)
 
@@ -55,9 +55,9 @@ def main(argv: list[str] | None = None) -> int:
         help="run a single scenario (default: run them all)",
     )
     parser.add_argument(
-        "--nzi-url",
+        "--tina-url",
         default=None,
-        help="optional Nzi dashboard URL to push alerts to (e.g. http://127.0.0.1:8080)",
+        help="optional TINA-X dashboard URL to push alerts to (e.g. http://127.0.0.1:8080)",
     )
     args = parser.parse_args(argv)
 
@@ -66,7 +66,7 @@ def main(argv: list[str] | None = None) -> int:
 
     keys = [args.scenario] if args.scenario else sorted(ALL.keys())
     for key in keys:
-        run_scenario(key, args.nzi_url)
+        run_scenario(key, args.tina_url)
 
     print(
         "\nNote: the single-hazard scenarios are survivable; the COMPOUND ones cascade. "

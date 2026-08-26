@@ -1,4 +1,4 @@
-; Project Nzi — symbolic treat/don't-treat decision with justification (P3.2).
+; Project TINA-X — symbolic treat/don't-treat decision with justification (P3.2).
 ;
 ; The ML model (perception/model.py) PERCEIVES: it returns a detected class + confidence. The
 ; DECISION to spray is made HERE, symbolically, so it is interpretable and verifiable — the same

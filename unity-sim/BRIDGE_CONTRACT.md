@@ -1,7 +1,7 @@
 # Unity ↔ Rust reflex bridge — message contract
 
 **Source of truth** for the wire format between the Unity sim (C#) and the Rust reflex loop.
-Both `unity-sim/Assets/Nzi/Scripts/BridgeMessages.cs` and `rust-core/src/unity_bridge.rs` must
+Both `unity-sim/Assets/TINA-X/Scripts/BridgeMessages.cs` and `rust-core/src/unity_bridge.rs` must
 match this document. If you change a field here, change it in BOTH and update their tests.
 
 ## Transport

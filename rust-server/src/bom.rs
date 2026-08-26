@@ -1,7 +1,7 @@
-//! Bill of Materials (BOM) for one Nzi agent — the IoT hardware, served to the dashboard.
+//! Bill of Materials (BOM) for one TINA-X agent — the IoT hardware, served to the dashboard.
 //!
 //! # For a junior dev / a hackathon judge
-//! Nzi is a *hardware* project (a fly-inspired robot), so people evaluating it want to see the
+//! TINA-X is a *hardware* project (a fly-inspired robot), so people evaluating it want to see the
 //! physical parts and rough cost, not just software. This module is the single source of truth
 //! for that list. Each part is tied to a design decision from our research folders, so the BOM
 //! doubles as a summary of WHY each component exists.
@@ -52,7 +52,7 @@ pub struct Bom {
     pub total_est_cost_usd: f32,
 }
 
-/// Build the reference BOM for a single low-cost Nzi agent (prototype tier).
+/// Build the reference BOM for a single low-cost TINA-X agent (prototype tier).
 ///
 /// The design choices trace directly to `fly-biomimicry/` and `limitations-edge-cases/`:
 /// cheap, collision-tolerant, optic-flow-guided, edge-compute — a deliberately inexpensive

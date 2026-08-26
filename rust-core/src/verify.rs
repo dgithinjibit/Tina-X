@@ -1,4 +1,4 @@
-//! The **action-gate**: Project Nzi's verification moat, in Rust (P2.2).
+//! The **action-gate**: Project TINA-X's verification moat, in Rust (P2.2).
 //!
 //! # Why this module exists (read this first if you're new)
 //!

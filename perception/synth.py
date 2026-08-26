@@ -1,4 +1,4 @@
-"""Project Nzi — synthetic crop-imagery generator (P3.1).
+"""Project TINA-X — synthetic crop-imagery generator (P3.1).
 
 WHY SYNTHETIC + STDLIB-ONLY:
   Real robotics perception is bottlenecked by labeled-data scarcity (see limitations-edge-cases/).

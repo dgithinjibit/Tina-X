@@ -1,4 +1,4 @@
-; Project Nzi — verification gate composer (P2.1)
+; Project TINA-X — verification gate composer (P2.1)
 ; The single entry point the Rust action-gate calls. It runs a proposed action through all five
 ; hallucination-type checks (defined in the sibling files) and returns:
 ;   Approved                 -- every check passed

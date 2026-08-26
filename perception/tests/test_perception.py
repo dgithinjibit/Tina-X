@@ -1,4 +1,4 @@
-"""Project Nzi — precision-ag perception tests (P3.1/P3.2/P3.4).
+"""Project TINA-X — precision-ag perception tests (P3.1/P3.2/P3.4).
 
 Pure-stdlib tests for the synthetic generator, the detector's measured quality, and the symbolic
 treat/don't-treat logic. The MeTTa-backed tests SKIP gracefully when hyperon isn't installed, like

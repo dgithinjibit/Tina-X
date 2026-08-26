@@ -10,7 +10,7 @@
 
 using System;
 
-namespace Nzi
+namespace TINA-X
 {
     /// <summary>A roll/pitch/yaw triple of body-frame angular rates or commands.</summary>
     [Serializable]

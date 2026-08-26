@@ -1,4 +1,4 @@
-"""Project Nzi — weather nowcasting tests (P5.1/P5.2/P5.3/P5.5), stdlib only.
+"""Project TINA-X — weather nowcasting tests (P5.1/P5.2/P5.3/P5.5), stdlib only.
 
 Verifies the synthetic data, the honest metrics, and that swarm fusion + symbolic calibration
 actually help. Symbolic (MeTTa) tests skip gracefully without hyperon.

@@ -47,7 +47,7 @@ export function SwarmPanel() {
   if (error) {
     return (
       <p data-testid="swarm-error" style={{ color: "#fbbf24" }}>
-        No swarm data. Start the API server: <code>cargo run -p nzi-server</code>{" "}
+        No swarm data. Start the API server: <code>cargo run -p tina-server</code>{" "}
         <span style={{ color: "#6b7fa3" }}>({error})</span>
       </p>
     );

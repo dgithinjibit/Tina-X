@@ -1,4 +1,4 @@
-"""Project Nzi — GNSS-derived Precipitable Water Vapor as a nowcasting input (G4D-RR bridge #5).
+"""Project TINA-X — GNSS-derived Precipitable Water Vapor as a nowcasting input (G4D-RR bridge #5).
 
 See docs/research/g4drr-gnss-eo-bridge.md. A ground GNSS receiver's signal delay yields the
 Zenith Tropospheric Delay, which converts to **Precipitable Water Vapor (PWV)** — the column of

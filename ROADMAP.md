@@ -1,4 +1,4 @@
-# 🗺️ Project Nzi — Build Roadmap
+# 🗺️ Project TINA-X — Build Roadmap
 
 > **Principle: one great bot before a fleet.** Every phase ends in something *runnable* and
 > *measured*. We do NOT lock in architecture before we benchmark. Each phase raises the two
@@ -20,7 +20,7 @@ Legend: 🔴 not started · 🟡 in progress · 🟢 done · ⚠️ open researc
 
 - 🟢 **P0.1** Scaffold the repo: `rust-core/` cargo workspace, `metta-logic/`, `docs/`. *(done)*
 - 🟢 **P0.2** Install & smoke-test Hyperon (0.2.10) in a venv; MeTTa runs from Python
-  (`metta-logic/run_smoke.py` → nzi-001 / True / False). Bindings confirmed pybind11/C-API. *(done)*
+  (`metta-logic/run_smoke.py` → tina-001 / True / False). Bindings confirmed pybind11/C-API. *(done)*
 - 🟢 **P0.3** ⚠️ **Benchmarked MeTTa ourselves** — parse-vs-eval split + Atomspace-size sweep
   (1e3/1e5/1e6). Findings in `docs/benchmarks/metta-baseline.md`:
   rule-eval ~2–7 ms p99 (size-independent, GOOD); direct `space.query()` is **O(n)**
@@ -28,7 +28,7 @@ Legend: 🔴 not started · 🟡 in progress · 🟢 done · ⚠️ open researc
 - 🟢 **P0.4** ✅ **Rust↔MeTTa bridge working.** Found `hyperon` is NOT on crates.io (git-only,
   no linkable `libhyperon`), so per **ADR 0003** we built a trait seam (`brain::SymbolicBrain`)
   with a `SubprocessBrain` that drives MeTTa via `metta-logic/bridge_worker.py`, plus a `FakeBrain`
-  test double. `cargo run -p nzi-core --bin brain-demo` shows Rust getting typed results from
+  test double. `cargo run -p tina-core --bin brain-demo` shows Rust getting typed results from
   MeTTa (`!(+ 1 2)` → `3`; safe-to-fly rule → `True/False`). Native FFI drops into the same trait
   later. *(done)*
 - 🟢 **P0.5** ADRs written: `0001-two-rate-brain.md`, `0002-partitioned-atomspace.md`,
@@ -48,7 +48,7 @@ loop validated (~900× under budget) ✅; **Rust drives MeTTa end-to-end** ✅ (
 > deferred to **Phase 7**; a scaffold to open locally already exists in `unity-sim/`.
 
 - ⏭️ **P1.1 → Phase 7** Unity ML-Agents scene: one agent, physics, a few obstacles.
-  *Scaffolded in `unity-sim/` (C# `NziAgent`/`ReflexBridgeClient` + `SCENE_SETUP.md`); needs the
+  *Scaffolded in `unity-sim/` (C# `TinaXAgent`/`ReflexBridgeClient` + `SCENE_SETUP.md`); needs the
   Unity editor, so it's built in Phase 7.*
 - 🟢 **P1.2** Rust reflex loop: **3-axis delayed-PD stabilizer** (`reflex::AttitudeStabilizer`,
   roll/pitch/yaw) driven by simulated rate gyros, budgeted **<13 ms** (fly halteres spec), running
@@ -89,11 +89,11 @@ Navigation-in-clutter is validated in Phase 7 with the Unity plant.
   constants) and `verify.metta` (the `gate-setpoint` composer that returns
   `Approved` / `(Rejected <check>)`). `python3 metta-logic/run_verify_smoke.py` is green (6/6:
   one good action approved, one bad per type rejected with the right reason). *(done)*
-- 🟢 **P2.2** **Rust action-gate** — `nzi-core::verify` (`Gate<B: SymbolicBrain>`, `Setpoint`,
+- 🟢 **P2.2** **Rust action-gate** — `tina-core::verify` (`Gate<B: SymbolicBrain>`, `Setpoint`,
   `Context`, `Verdict`) loads the `.metta` rules at runtime (single source of truth on disk),
   builds `<rules>\n!(gate-setpoint …)`, runs it through the `SymbolicBrain` seam and parses the
   verdict **fail-closed** (an unrecognized answer is never treated as approval). `FakeBrain`
-  unit tests + `cargo run -p nzi-core --bin verify-demo`. *(done)*
+  unit tests + `cargo run -p tina-core --bin verify-demo`. *(done)*
 - 🟢 **P2.3** **Fault-injection tests** — `rust-core/tests/verify_integration.rs` feeds the real
   gate a bad action per type and asserts each hallucination type is caught, not acted on
   (7 tests, venv-backed, skip-gracefully). `Verdict::is_approved()` maps directly onto the
@@ -104,11 +104,11 @@ Navigation-in-clutter is validated in Phase 7 with the Unity plant.
   facts), `mission.metta` (per-mode goal + the `decide-setpoint` reasoning rule), `agent.metta`
   (self identity/confidence). Proposals are clamped into the envelope so a healthy one is
   gate-consistent by construction. `python3 metta-logic/run_supervise_smoke.py` green (2/2). *(done)*
-- 🟢 **P2.5** Slow supervisory loop: `nzi-core::supervise::Supervisor<B: SymbolicBrain>`. Each
+- 🟢 **P2.5** Slow supervisory loop: `tina-core::supervise::Supervisor<B: SymbolicBrain>`. Each
   `tick` asks the brain to propose a setpoint (KB + telemetry), runs it through the Stage-① gate,
   and forwards ONLY approved setpoints to the reflex loop — the gate sits between the two rates,
   never inside the <13 ms path. Emits a `BrainDecision` per tick. `FakeBrain` unit tests +
-  venv-backed `supervise_integration.rs` + `cargo run -p nzi-core --bin supervise-demo`. *(done)*
+  venv-backed `supervise_integration.rs` + `cargo run -p tina-core --bin supervise-demo`. *(done)*
 - 🟢 **P2.6** Governance (**fail-closed**): the supervisor retains the last-known-safe setpoint and
   holds it on any non-approval — `Refused(<check>)` (gate rejected) or `HeldOnDoubt(<reason>)`
   (empty/unparseable/errored proposal). Doubt is never treated as approval. Proven by the
@@ -153,7 +153,7 @@ decisions, with a measured ~70% pesticide-reduction story. Real imagery + Unity 
 
 > Built headless in the new `rust-swarm/` crate (no Unity). Only the 3D visualization is deferred.
 
-- 🟢 **P4.1** Headless multi-agent sim (`nzi-swarm::Swarm`): N agents on a grid, **neighbor-local
+- 🟢 **P4.1** Headless multi-agent sim (`tina-swarm::Swarm`): N agents on a grid, **neighbor-local
   comms only** — `step` delivers messages along topology edges and never lets an agent read global
   state (the invariant is enforced by module boundaries). *(done)*
 - 🟢 **P4.2** **SoNS** (`sons.rs`): runtime-formed hierarchy via distributed max-consensus with
@@ -295,9 +295,9 @@ with an honest Kumamoto-anchored problem→solution narrative and dataset attrib
   friendly BN254 verifier (P6.2) and attach proofs to on-chain telemetry (P6.1 Robonomics).
 - **TINA-X (flagship reasoning app)** — 🟢 core built: `tina-x/` independent component
   (ADR 0005). MeTTa dependency graph + cascading-failure rules + Python black-swan injector +
-  optional Nzi-dashboard bridge (verified end-to-end). Next: OSM ingestion (real region),
+  optional TINA-X-dashboard bridge (verified end-to-end). Next: OSM ingestion (real region),
   live API feeds (USGS/NOAA/DSCOVR), supply-chain + space-weather modules, and ZK-attested alerts.
-  Grows independently of the robotics phases; Nzi's swarm becomes one of its sensor feeds.
+  Grows independently of the robotics phases; TINA-X's swarm becomes one of its sensor feeds.
 - **YC readiness** — after Phase 3, we have a demoable wedge that maps to YC's named ag-robotics RFS.
 
 ---

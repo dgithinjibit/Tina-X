@@ -4,10 +4,10 @@
 //! Phase 0 (P0) principle: we MEASURE from day one. This is the smallest possible
 //! version of the "benchmark before you lock in real-time" discipline in ROADMAP.md.
 //!
-//! Run: `cargo run -p nzi-core --bin reflex-demo`
+//! Run: `cargo run -p tina-core --bin reflex-demo`
 
-use nzi_core::reflex::{PdGains, ReflexStabilizer};
-use nzi_core::{REFLEX_BUDGET_US, REFLEX_TARGET_HZ};
+use tina_core::reflex::{PdGains, ReflexStabilizer};
+use tina_core::{REFLEX_BUDGET_US, REFLEX_TARGET_HZ};
 use std::time::Instant;
 
 fn main() {
@@ -46,7 +46,7 @@ fn main() {
     let avg_us = sum_us as f64 / steps as f64;
     let final_error = (setpoint - measured).abs();
 
-    println!("Project Nzi — reflex loop micro-benchmark (P0)");
+    println!("Project TINA-X — reflex loop micro-benchmark (P0)");
     println!("  target frequency : {REFLEX_TARGET_HZ} Hz (dt = {dt:.6} s)");
     println!("  latency budget   : {REFLEX_BUDGET_US} us (fly ~13 ms stabilization)");
     println!("  steps            : {steps}");

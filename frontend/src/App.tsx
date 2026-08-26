@@ -1,7 +1,7 @@
-// The Project Nzi landing + mission-control page.
+// The Project TINA-X landing + mission-control page.
 //
 // Structure (top to bottom):
-//   1. Hero        — what Nzi is, for a judge who has 30 seconds.
+//   1. Hero        — what TINA-X is, for a judge who has 30 seconds.
 //   2. Live reflex — real telemetry from the Rust server (proves the control loop works).
 //   3. How it works — the two-rate brain, in plain words.
 //   4. BOM         — the IoT hardware, because this is a physical project.
@@ -47,12 +47,12 @@ export function App() {
     <main style={styles.page}>
       {/* 1. HERO ------------------------------------------------------------------ */}
       <header style={styles.hero}>
-        <h1 style={styles.title}>🪰 Project Nzi</h1>
+        <h1 style={styles.title}>🪰 Project TINA-X</h1>
         <p style={styles.tagline}>
           Bio-inspired autonomous robot swarms for a <strong>good life 2030</strong>. We borrow the
           fly&apos;s biology — fast reflexes, optic-flow vision, collision tolerance, swarm
           behavior — to build cheap, decentralized agents for precision agriculture and
-          harsh-weather early warning. <em>Nzi</em> means &quot;fly&quot; in Swahili.
+          harsh-weather early warning. <em>TINA-X</em> means &quot;fly&quot; in Swahili.
         </p>
         <div style={styles.badges}>
           <Badge label="Rust core" />
@@ -100,7 +100,7 @@ export function App() {
 
         {conn !== "open" && (
           <p style={styles.hint}>
-            No live data yet. Start the API server: <code>cargo run -p nzi-server</code>
+            No live data yet. Start the API server: <code>cargo run -p tina-server</code>
           </p>
         )}
       </section>
@@ -176,7 +176,7 @@ export function App() {
 
       {/* 4. BOM ------------------------------------------------------------------- */}
       <section style={styles.section}>
-        <h2 style={styles.h2}>Bill of materials — one Nzi agent</h2>
+        <h2 style={styles.h2}>Bill of materials — one TINA-X agent</h2>
         <p style={styles.muted}>
           This is real hardware. Each part traces to a fly trait or a research finding, and the
           whole agent is deliberately cheap so a swarm is affordable.
@@ -185,7 +185,7 @@ export function App() {
       </section>
 
       <footer style={styles.footer}>
-        Project Nzi · MIT · research-backed &amp; benchmarked · not war — a good life.
+        Project TINA-X · MIT · research-backed &amp; benchmarked · not war — a good life.
       </footer>
     </main>
   );

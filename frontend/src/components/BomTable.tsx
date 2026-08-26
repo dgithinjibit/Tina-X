@@ -11,7 +11,7 @@ export function BomTable({ bom, error }: Props) {
   if (error) {
     return (
       <p data-testid="bom-error" style={{ color: "#f87171" }}>
-        Could not load BOM ({error}). Is the Rust server running? (`cargo run -p nzi-server`)
+        Could not load BOM ({error}). Is the Rust server running? (`cargo run -p tina-server`)
       </p>
     );
   }

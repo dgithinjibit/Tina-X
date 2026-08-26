@@ -1,7 +1,7 @@
 # zk-cairo — DORMANT reference mirror (frozen 2026-08-09)
 
 > **Status: dormant / not maintained.** This crate is a frozen reference implementation of the
-> Nzi "Verifiable Safe-to-Fly Decision" statement in Cairo (Starknet-native, STARK, no trusted
+> TINA-X "Verifiable Safe-to-Fly Decision" statement in Cairo (Starknet-native, STARK, no trusted
 > setup). It is kept for reference only.
 
 **The live ZK path is [`../zk-rust/`](../zk-rust/)** (arkworks Groth16/BN254), which proves and

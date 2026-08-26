@@ -1,7 +1,7 @@
 [package]
-name = "nzi-core"
+name = "tina-core"
 version = "0.0.1"
-description = "Project Nzi agent core: reflex loop, telemetry, MeTTa bridge (Phase 0 scaffold)"
+description = "Project TINA-X agent core: reflex loop, telemetry, MeTTa bridge (Phase 0 scaffold)"
 edition.workspace = true
 license.workspace = true
 authors.workspace = true

@@ -9,16 +9,16 @@ Everything below is runnable today. See `ROADMAP.md` for what comes next.
 
 ## Rust core (fast reflex loop + slow MeTTa brain bridge)
 ```bash
-cargo test  -p nzi-core                    # 10 tests (8 unit + 2 bridge integration)
-cargo run   -p nzi-core --bin reflex-demo  # reflex micro-benchmark vs the 13 ms fly budget
-cargo run   -p nzi-core --bin brain-demo   # Rust <-> MeTTa bridge (needs the venv below)
+cargo test  -p tina-core                    # 10 tests (8 unit + 2 bridge integration)
+cargo run   -p tina-core --bin reflex-demo  # reflex micro-benchmark vs the 13 ms fly budget
+cargo run   -p tina-core --bin brain-demo   # Rust <-> MeTTa bridge (needs the venv below)
 cargo clippy --all-targets                 # lint (whole workspace, 0 warnings)
 ```
 
 ## Mission-control API + frontend (the live demo for judges)
 ```bash
 # Terminal 1 — the Rust API (telemetry + bill of materials):
-cargo run -p nzi-server                    # http://127.0.0.1:8080  (GET /api/health|bom|status, WS /ws)
+cargo run -p tina-server                    # http://127.0.0.1:8080  (GET /api/health|bom|status, WS /ws)
 
 # Terminal 2 — the React + TypeScript dashboard:
 cd frontend
@@ -43,11 +43,11 @@ python3 -m venv .venv
 .venv/bin/pip install --upgrade pip
 .venv/bin/pip install hyperon          # 0.2.10, pre-alpha
 
-.venv/bin/python metta-logic/run_smoke.py            # smoke test: nzi-001 / True / False
+.venv/bin/python metta-logic/run_smoke.py            # smoke test: tina-001 / True / False
 .venv/bin/python metta-logic/bench_metta.py          # latency baseline (P0.3)
 .venv/bin/python metta-logic/bridge_worker.py '!(+ 1 2)'  # the worker Rust calls -> {"ok":true,...}
 ```
-With the venv present, re-run `cargo run -p nzi-core --bin brain-demo` and the 2 integration
+With the venv present, re-run `cargo run -p tina-core --bin brain-demo` and the 2 integration
 tests to see Rust drive MeTTa for real.
 
 ## What Phase 0 has proven

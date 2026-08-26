@@ -1,7 +1,7 @@
 [package]
-name = "nzi-zk-rust"
+name = "tina-zk-rust"
 version = "0.0.1"
-description = "Project Nzi ZK POC (Rust-native, arkworks Groth16): prove a safe-to-fly decision"
+description = "Project TINA-X ZK POC (Rust-native, arkworks Groth16): prove a safe-to-fly decision"
 edition.workspace = true
 license.workspace = true
 authors.workspace = true

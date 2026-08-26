@@ -10,9 +10,9 @@
 //! suite stays green everywhere, but proves the real bridge wherever MeTTa is installed.
 //!
 //! Run it explicitly with output visible:
-//!   cargo test -p nzi-core --test brain_integration -- --nocapture
+//!   cargo test -p tina-core --test brain_integration -- --nocapture
 
-use nzi_core::brain::{MettaQuery, SubprocessBrain, SymbolicBrain};
+use tina_core::brain::{MettaQuery, SubprocessBrain, SymbolicBrain};
 use std::path::PathBuf;
 
 /// The project root is the parent of this crate's directory (`rust-core/`).

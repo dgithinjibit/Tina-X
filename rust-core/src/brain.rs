@@ -2,7 +2,7 @@
 //!
 //! # Why this module exists (read this first if you're new)
 //!
-//! Project Nzi has a **two-rate brain** (see `docs/adr/0001-two-rate-brain.md`):
+//! Project TINA-X has a **two-rate brain** (see `docs/adr/0001-two-rate-brain.md`):
 //! - a FAST reflex loop in [`crate::reflex`] (microseconds, control stability), and
 //! - a SLOW symbolic brain in MeTTa/Hyperon (milliseconds, reasoning & verification).
 //!

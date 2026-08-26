@@ -52,9 +52,9 @@ reason recorded:
   the supervisory tick rate rises.
 
 ## Validation
-- `cargo test -p nzi-core` — supervisor unit tests (approve→forward, refuse→hold, doubt→hold,
+- `cargo test -p tina-core` — supervisor unit tests (approve→forward, refuse→hold, doubt→hold,
   parser) + `supervise_integration.rs` (real KB→gate: free approved, hold-level→zero approved,
   stale telemetry refused-and-held).
-- `cargo run -p nzi-core --bin supervise-demo` — a 4-tick scenario showing approvals forwarded and
+- `cargo run -p tina-core --bin supervise-demo` — a 4-tick scenario showing approvals forwarded and
   a stale-telemetry tick refused with last-safe held.
 - `python3 metta-logic/run_supervise_smoke.py` — the KB `decide-setpoint` rule in isolation.

@@ -13,7 +13,7 @@ constraint is that no agent may read global state — coordination must emerge f
 messages alone, or it isn't a swarm.
 
 ## Decision
-Model leader election as a **distributed max-consensus with distance** (`nzi-swarm`):
+Model leader election as a **distributed max-consensus with distance** (`tina-swarm`):
 
 - Each agent holds a `LeaderBelief { leader, distance }` and gossips it to neighbors each tick.
 - On receipt, an agent adopts the best belief among {itself, neighbors' beliefs +1 hop}, where
@@ -46,7 +46,7 @@ a belief from a *live* leader (whose gradient stays short).
   be proven; mobility is a later concern.
 
 ## Validation
-- `cargo test -p nzi-swarm` — 12 unit + 7 emergent-behavior tests: single-leader convergence,
+- `cargo test -p tina-swarm` — 12 unit + 7 emergent-behavior tests: single-leader convergence,
   distance gradient, brain-death re-election, higher-id rejoin, full-field stigmergic coverage,
   coverage-survives-partial-loss, 400-agent scale.
-- `cargo run -p nzi-swarm --bin swarm-demo` — self-organize → cover → kill brain → self-heal.
+- `cargo run -p tina-swarm --bin swarm-demo` — self-organize → cover → kill brain → self-heal.

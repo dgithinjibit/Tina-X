@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""Project Nzi — weather nowcasting pipeline demo (P5.1/P5.2/P5.3/P5.4/P5.5).
+"""Project TINA-X — weather nowcasting pipeline demo (P5.1/P5.2/P5.3/P5.4/P5.5).
 
 Ties the flagship edge case together, HONESTLY (Brier / reliability / ETS / lead time — never a
 "99% accuracy" claim):
@@ -67,7 +67,7 @@ def say(*args) -> None:
 
 
 def main() -> int:
-    say("Project Nzi — harsh-weather nowcasting pipeline (Phase 5)")
+    say("Project TINA-X — harsh-weather nowcasting pipeline (Phase 5)")
     say("  metrics: Brier / reliability / ETS / lead time (NEVER a '99% accuracy' claim)")
 
     # Optional symbolic layer (P5.3). Steps 1-3 are pure stdlib and always run.

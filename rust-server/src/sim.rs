@@ -2,15 +2,15 @@
 //!
 //! # For a junior dev
 //! The dashboard needs *something* to show. Until we have real hardware (Phase 6) or the Unity
-//! sim (Phase 1), this module runs the SAME reflex stabilizer from `nzi-core` against a toy
+//! sim (Phase 1), this module runs the SAME reflex stabilizer from `tina-core` against a toy
 //! plant and emits [`ReflexSample`]s — so judges see a real, running control loop, not a mockup.
 //!
 //! This is pure logic (no async, no HTTP) so it is easy to unit-test. The server layer just
 //! calls [`AgentSim::tick`] on a timer and forwards the samples.
 
-use nzi_core::reflex::{AttitudeStabilizer, Vec3};
-use nzi_core::telemetry::{AgentStatus, Axis3, AttitudeSample, ReflexSample};
-use nzi_core::REFLEX_BUDGET_US;
+use tina_core::reflex::{AttitudeStabilizer, Vec3};
+use tina_core::telemetry::{AgentStatus, Axis3, AttitudeSample, ReflexSample};
+use tina_core::REFLEX_BUDGET_US;
 use std::time::Instant;
 
 /// Convert a control-layer `Vec3` into the telemetry-layer `Axis3` (wire type).
@@ -18,7 +18,7 @@ fn to_axis3(v: Vec3) -> Axis3 {
     Axis3 { roll: v.roll, pitch: v.pitch, yaw: v.yaw }
 }
 
-/// One simulated Nzi agent: a 3-axis attitude stabilizer + a toy per-axis rate-integrator plant.
+/// One simulated TINA-X agent: a 3-axis attitude stabilizer + a toy per-axis rate-integrator plant.
 pub struct AgentSim {
     agent_id: String,
     stab: AttitudeStabilizer,
@@ -112,7 +112,7 @@ mod tests {
 
     #[test]
     fn tick_advances_step_and_reports_latency() {
-        let mut sim = AgentSim::new("nzi-001", 1.0 / 500.0);
+        let mut sim = AgentSim::new("tina-001", 1.0 / 500.0);
         let a = sim.tick();
         let b = sim.tick();
         assert_eq!(a.step, 1);
@@ -124,7 +124,7 @@ mod tests {
     #[test]
     fn tick_emits_three_axis_attitude() {
         // The richer telemetry must be present, and its roll axis must equal the legacy scalars.
-        let mut sim = AgentSim::new("nzi-001", 1.0 / 500.0);
+        let mut sim = AgentSim::new("tina-001", 1.0 / 500.0);
         let s = sim.tick();
         let att = s.attitude.expect("attitude should be populated by the multi-axis sim");
         assert_eq!(att.setpoint.roll, s.setpoint);
@@ -134,7 +134,7 @@ mod tests {
 
     #[test]
     fn sim_converges_on_all_axes() {
-        let mut sim = AgentSim::new("nzi-001", 1.0 / 500.0);
+        let mut sim = AgentSim::new("tina-001", 1.0 / 500.0);
         for _ in 0..5000 {
             sim.tick();
         }
@@ -145,7 +145,7 @@ mod tests {
 
     #[test]
     fn changing_setpoint_is_reflected() {
-        let mut sim = AgentSim::new("nzi-001", 1.0 / 500.0);
+        let mut sim = AgentSim::new("tina-001", 1.0 / 500.0);
         sim.set_setpoint(Vec3::new(2.0, 0.0, 0.0));
         let s = sim.tick();
         assert_eq!(s.setpoint, 2.0); // roll axis surfaces in the legacy scalar

@@ -20,7 +20,7 @@ describe("BomTable", () => {
 
   it("shows a helpful error when the request failed", () => {
     render(<BomTable bom={null} error="500" />);
-    expect(screen.getByTestId("bom-error")).toHaveTextContent("cargo run -p nzi-server");
+    expect(screen.getByTestId("bom-error")).toHaveTextContent("cargo run -p tina-server");
   });
 
   it("renders every item and the total", () => {

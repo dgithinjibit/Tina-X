@@ -1,4 +1,4 @@
-; Project Nzi — symbolic hazard-guidance constraint layer (P5.3).
+; Project TINA-X — symbolic hazard-guidance constraint layer (P5.3).
 ;
 ; The ML/ensemble side (weather-prediction/nowcast.py) produces a raw hazard PROBABILITY per cell.
 ; This symbolic layer turns that number into INTERPRETABLE, better-calibrated guidance by applying

@@ -2,7 +2,7 @@
 //!
 //! # The two-rate hand-off (read this first)
 //!
-//! Project Nzi has a fast reflex loop ([`crate::reflex`], <13 ms) and a slow symbolic brain
+//! Project TINA-X has a fast reflex loop ([`crate::reflex`], <13 ms) and a slow symbolic brain
 //! (MeTTa, milliseconds). This module is the SLOW side's control step. Each supervisory tick:
 //!
 //!   1. asks the brain to **propose** a setpoint by reasoning over the knowledge base

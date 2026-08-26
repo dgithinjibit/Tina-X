@@ -4,13 +4,13 @@
 //! alone: hierarchy formation (single brain), stigmergic field coverage, and re-election after the
 //! brain is killed. No Unity — this is the coordination LOGIC; the 3D view is Phase 7.
 //!
-//! Run:  cargo run -p nzi-swarm --bin swarm-demo
+//! Run:  cargo run -p tina-swarm --bin swarm-demo
 
-use nzi_swarm::stigmergy::SERVICE_TARGET;
-use nzi_swarm::Swarm;
+use tina_swarm::stigmergy::SERVICE_TARGET;
+use tina_swarm::Swarm;
 
 fn main() {
-    println!("Project Nzi — SoNS swarm demo (Phase 4, headless)");
+    println!("Project TINA-X — SoNS swarm demo (Phase 4, headless)");
 
     let (w, h) = (8, 8);
     let mut swarm = Swarm::grid(w, h);
@@ -42,7 +42,7 @@ fn main() {
     // 3. Kill the brain and watch it self-heal.
     let brain = (swarm.len() - 1) as u32;
     swarm.kill(brain);
-    let recovery = (nzi_swarm::sons::MAX_HORIZON + 12) as u64;
+    let recovery = (tina_swarm::sons::MAX_HORIZON + 12) as u64;
     println!("  !! killed the brain (agent {brain}) — running {recovery} more ticks (self-heal)...");
     swarm.run(recovery);
     println!(

@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""Project Nzi — verification-moat smoke test (P2.1).
+"""Project TINA-X — verification-moat smoke test (P2.1).
 
 Loads the five hallucination-type checks + the gate composer, then asserts that:
   * a well-formed, safe setpoint is Approved, and
@@ -73,7 +73,7 @@ def main() -> int:
         return 1
 
     base = preamble()
-    print("Project Nzi — verification-moat smoke test")
+    print("Project TINA-X — verification-moat smoke test")
     failures = 0
 
     for label, action, ctx, expected in CASES:

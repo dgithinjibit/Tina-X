@@ -1,6 +1,6 @@
 """Tests for the TINA-X reasoning engine.
 
-These run WITHOUT any part of Nzi present (ADR 0005): pure hyperon + local code.
+These run WITHOUT any part of TINA-X present (ADR 0005): pure hyperon + local code.
 """
 from __future__ import annotations
 

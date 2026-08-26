@@ -1,10 +1,10 @@
-# Project Nzi — MeTTa/Hyperon hackathon grill
+# Project TINA-X — MeTTa/Hyperon hackathon grill
 
 ## Executive assessment
 
-**Recommendation: submit, but narrow the live pitch.** Nzi has a credible MeTTa/Hyperon core and more implementation evidence than a typical concept-only submission. It is not yet a credible “complete autonomous swarm” product. Its strongest competitive position is a reusable symbolic supervisory layer that turns facts and rules into an explainable, verified action across multiple domains.
+**Recommendation: submit, but narrow the live pitch.** TINA-X has a credible MeTTa/Hyperon core and more implementation evidence than a typical concept-only submission. It is not yet a credible “complete autonomous swarm” product. Its strongest competitive position is a reusable symbolic supervisory layer that turns facts and rules into an explainable, verified action across multiple domains.
 
-The official Hyperon overview emphasizes Atomspace metagraphs, MeTTa’s multiparadigm reasoning model, interaction with external processes, and cognitive-system composition [1]. Nzi’s bridge, rule files, Atomspace partitioning decision, TINA-X cascade engine, and downstream Rust gate map to those strengths. The ecosystem itself is described as active pre-alpha software [2], so transparent limitations are a strength rather than an embarrassment.
+The official Hyperon overview emphasizes Atomspace metagraphs, MeTTa’s multiparadigm reasoning model, interaction with external processes, and cognitive-system composition [1]. TINA-X’s bridge, rule files, Atomspace partitioning decision, TINA-X cascade engine, and downstream Rust gate map to those strengths. The ecosystem itself is described as active pre-alpha software [2], so transparent limitations are a strength rather than an embarrassment.
 
 ## Scoring rubric
 
@@ -33,7 +33,7 @@ Explain that agriculture, weather, swarms, and TINA-X are testbeds for one subst
 
 ### “Is it real-time?”
 
-Say precisely: the reflex loop is the real-time path; MeTTa is supervisory and intentionally excluded from the reflex path. Nzi’s local benchmarks measured rule evaluation at millisecond scale and observed flat-space query growth, which motivated partitioning. These are project measurements, not universal Hyperon guarantees.
+Say precisely: the reflex loop is the real-time path; MeTTa is supervisory and intentionally excluded from the reflex path. TINA-X’s local benchmarks measured rule evaluation at millisecond scale and observed flat-space query growth, which motivated partitioning. These are project measurements, not universal Hyperon guarantees.
 
 ### “What is actually finished?”
 
@@ -51,7 +51,7 @@ The dashboard should be used only if it makes the decision trace clearer. A poli
 
 ## Required submission discipline
 
-Use the README’s “What Nzi is—and is not” table to prevent overclaiming. Put all performance numbers beside their benchmark command and environment. Keep a short architecture diagram in the submission. Add one screenshot or terminal transcript showing the MeTTa result, the explanation, and the downstream action. If the event supplies a formal rubric, map this document’s criteria to it instead of inventing stronger claims.
+Use the README’s “What TINA-X is—and is not” table to prevent overclaiming. Put all performance numbers beside their benchmark command and environment. Keep a short architecture diagram in the submission. Add one screenshot or terminal transcript showing the MeTTa result, the explanation, and the downstream action. If the event supplies a formal rubric, map this document’s criteria to it instead of inventing stronger claims.
 
 ## References
 

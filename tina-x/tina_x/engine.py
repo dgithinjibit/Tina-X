@@ -9,8 +9,8 @@ This is the Python front door to the MeTTa reasoner. It:
   3. QUERIES the derived predicates (hospital-critical, hospital-isolated, datacenter-down) to
      produce a list of predicted failures.
 
-It deliberately mirrors Nzi's `SubprocessBrain` idea (drive MeTTa from another language) but is a
-LOCAL copy — TINA-X does not import any Nzi code (see ADR 0005).
+It deliberately mirrors TINA-X's `SubprocessBrain` idea (drive MeTTa from another language) but is a
+LOCAL copy — TINA-X does not import any TINA-X code (see ADR 0005).
 """
 from __future__ import annotations
 

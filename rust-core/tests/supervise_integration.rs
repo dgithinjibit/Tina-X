@@ -15,11 +15,11 @@
 //!
 //! Skips gracefully when the venv isn't set up, like the other integration tests.
 //!
-//! Run:  cargo test -p nzi-core --test supervise_integration -- --nocapture
+//! Run:  cargo test -p tina-core --test supervise_integration -- --nocapture
 
-use nzi_core::brain::SubprocessBrain;
-use nzi_core::reflex::Vec3;
-use nzi_core::supervise::{Disposition, Supervisor, Telemetry};
+use tina_core::brain::SubprocessBrain;
+use tina_core::reflex::Vec3;
+use tina_core::supervise::{Disposition, Supervisor, Telemetry};
 use std::path::PathBuf;
 
 fn project_root() -> PathBuf {

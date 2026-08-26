@@ -1,4 +1,4 @@
-"""Project Nzi — thermodynamic / pbit sampling exploration for nowcasting (P5.4).
+"""Project TINA-X — thermodynamic / pbit sampling exploration for nowcasting (P5.4).
 
 STATUS: ASPIRATIONAL-BUT-REAL (see weather-prediction/README.md, leg B). Extropic's Thermodynamic
 Sampling Units (TSUs) sample from energy-based models via Gibbs sampling using *pbits* — transistor-

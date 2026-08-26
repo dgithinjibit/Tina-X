@@ -1,4 +1,4 @@
-"""Project Nzi — bridge from ensemble nowcast to the MeTTa hazard-guidance layer (P5.3).
+"""Project TINA-X — bridge from ensemble nowcast to the MeTTa hazard-guidance layer (P5.3).
 
 Runs each cell's (probability, ensemble-agreement, persistence) through the symbolic constraint
 rules in metta-logic/weather/hazard.metta and returns the CALIBRATED probability field. The
@@ -45,7 +45,7 @@ def apply_guidance(prob, members, prev_truth, metta=None) -> list[list[float]]:
 
     IMPORTANT: each call runs against a FRESH MeTTa space. Reusing one long-lived space across calls
     re-adds the preamble's `(= ...)` rule definitions every time, and duplicate equations become
-    OVERLAPPING clauses — a known hyperon gotcha (see memory: nzi-metta-gotchas) that makes eval
+    OVERLAPPING clauses — a known hyperon gotcha (see memory: tina-metta-gotchas) that makes eval
     non-deterministic and blows up wall-time super-linearly. A fresh space per call keeps it linear.
     The `metta` argument is accepted for backwards-compatibility but intentionally not reused as the
     space; pass one or omit it, either way we evaluate in a clean space.

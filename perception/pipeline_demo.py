@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""Project Nzi — precision-ag perception pipeline demo (P3.1 + P3.2 + P3.4).
+"""Project TINA-X — precision-ag perception pipeline demo (P3.1 + P3.2 + P3.4).
 
 The end-to-end economically-real task, runnable here:
   1. generate a synthetic labeled field (train + held-out test),
@@ -21,7 +21,7 @@ from synth import make_dataset  # noqa: E402
 
 
 def main() -> int:
-    print("Project Nzi — precision-ag perception pipeline (Phase 3)")
+    print("Project TINA-X — precision-ag perception pipeline (Phase 3)")
 
     # 1. Deterministic synthetic field. Different seeds for train vs. test = a real held-out split.
     train_set = make_dataset(n=1500, seed=1)

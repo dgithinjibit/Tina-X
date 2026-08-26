@@ -1,7 +1,7 @@
 //! The **quorum arbiter**: the Rust side of the honeybee collective-decision (bee brain B1–B4).
 //!
 //! # What this is
-//! Phase-4 SoNS ([`nzi_swarm`], a separate crate) elects ONE transient "brain" per connected group
+//! Phase-4 SoNS ([`tina_swarm`], a separate crate) elects ONE transient "brain" per connected group
 //! via cheap neighbor-local max-consensus. That answers *who coordinates*. This module answers the
 //! next question — *what does the group commit to* — for choices where committing on weak evidence
 //! is dangerous (which field to service, which rally-point, which of several near-equal setpoints).
@@ -24,7 +24,7 @@
 //! # MeTTa gotcha (mirrors `run_quorum_smoke.py`)
 //! Options MUST be written FLAT — `(opt north 7 0)` — never with `(id ..)`/`(support ..)`
 //! sub-wrappers, which MeTTa would evaluate away before the accessors match (see
-//! `nzi-metta-gotchas`). [`Tally::to_metta`] enforces the flat form.
+//! `tina-metta-gotchas`). [`Tally::to_metta`] enforces the flat form.
 
 use std::path::Path;
 

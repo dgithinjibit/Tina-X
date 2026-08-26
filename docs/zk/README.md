@@ -1,7 +1,7 @@
-# Zero-Knowledge proofs in Project Nzi
+# Zero-Knowledge proofs in Project TINA-X
 
 ## Why ZK at all (read this first)
-Nzi is a **decentralized swarm** whose whole differentiator is **verifiable** decisions
+TINA-X is a **decentralized swarm** whose whole differentiator is **verifiable** decisions
 (the MeTTa "verification moat"). ZK proofs make that verifiability *cryptographic and portable*:
 one agent (or a blockchain) can trust another agent's decision **without re-running it and without
 seeing its private internal state**.
@@ -40,12 +40,12 @@ SAME logic the symbolic brain runs — that is the point: cryptographically atte
 ## Comparison criteria (decided in ADR 0004 after both POCs exist)
 1. **Does it actually prove & verify?** (correctness roundtrip, rejects a lying prover)
 2. **Proof / verify time** for this tiny circuit.
-3. **Integration** with the rest of Nzi (Rust core, Robonomics/on-chain path).
+3. **Integration** with the rest of TINA-X (Rust core, Robonomics/on-chain path).
 4. **Dependency & toolchain weight** (build time, extra runtimes).
 5. **Ergonomics** for a junior dev to extend to the next statements.
 
 ## POCs
-- Rust-native (arkworks Groth16/BN254): `zk-rust/` — `cargo run -p nzi-zk-rust --release`
+- Rust-native (arkworks Groth16/BN254): `zk-rust/` — `cargo run -p tina-zk-rust --release`
 - Cairo (Scarb): `zk-cairo/` — `scarb cairo-test`
 
 Both prove the statement above and reject a prover who claims a decision inconsistent with the rule.

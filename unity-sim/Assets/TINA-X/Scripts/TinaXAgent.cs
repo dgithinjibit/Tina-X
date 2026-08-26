@@ -1,4 +1,4 @@
-// The one Nzi agent for Phase 1: a rigid body whose attitude is stabilized by the RUST reflex
+// The one TINA-X agent for Phase 1: a rigid body whose attitude is stabilized by the RUST reflex
 // loop over the bridge. This is the "body"; Rust is the "brain" (ADR 0001).
 //
 // Every fixed physics tick we:
@@ -18,10 +18,10 @@
 using Unity.MLAgents;
 using UnityEngine;
 
-namespace Nzi
+namespace TINA-X
 {
     [RequireComponent(typeof(Rigidbody))]
-    public sealed class NziAgent : Agent
+    public sealed class TinaXAgent : Agent
     {
         [Tooltip("Scales the [-1,1] command from Rust into physical torque (N·m).")]
         public float torqueScale = 0.5f;
@@ -64,7 +64,7 @@ namespace Nzi
 
                 // Surface the reflex latency in the editor so you can watch the 13 ms budget.
                 if (cmd.latency_us >= 13000)
-                    Debug.LogWarning($"[Nzi] reflex step over budget: {cmd.latency_us} µs");
+                    Debug.LogWarning($"[TINA-X] reflex step over budget: {cmd.latency_us} µs");
             }
 
             // 3. Apply it in body frame.

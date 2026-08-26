@@ -15,10 +15,10 @@
 //!
 //! Skips gracefully when the venv isn't set up, like the other integration tests.
 //!
-//! Run:  cargo test -p nzi-core --test quorum_integration -- --nocapture
+//! Run:  cargo test -p tina-core --test quorum_integration -- --nocapture
 
-use nzi_core::brain::SubprocessBrain;
-use nzi_core::quorum::{QuorumArbiter, QuorumVerdict, Risk, Tally};
+use tina_core::brain::SubprocessBrain;
+use tina_core::quorum::{QuorumArbiter, QuorumVerdict, Risk, Tally};
 use std::path::PathBuf;
 
 fn project_root() -> PathBuf {

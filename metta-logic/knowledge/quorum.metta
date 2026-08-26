@@ -1,4 +1,4 @@
-; Project Nzi — honeybee QUORUM + CROSS-INHIBITION collective decision (bee brain upgrade B1–B4).
+; Project TINA-X — honeybee QUORUM + CROSS-INHIBITION collective decision (bee brain upgrade B1–B4).
 ;
 ; See docs/research/bee-ant-brain-mechanisms.md. This is the SLOW MeTTa layer for choosing ONE
 ; shared target among competing options across a SoNS component (e.g. which field/rally-point the
@@ -28,7 +28,7 @@
 ;   (Commit $id $weight quorum-reached)
 ;   (Scout below-quorum)                 -- no option has crossed quorum yet (keep gathering)
 ;
-; MeTTa gotcha (learned the hard way, see nzi-metta-gotchas): the option is written FLAT as
+; MeTTa gotcha (learned the hard way, see tina-metta-gotchas): the option is written FLAT as
 ; (opt $id $s $m) — NOT with (id ..)/(support ..) sub-wrappers. A sub-term like (id north) gets
 ; EVALUATED (id behaves as identity), collapsing the data before the accessor can match it, leaving
 ; the whole rule unreduced. Flat positional data has nothing evaluable inside, so accessors fire.

@@ -1,8 +1,8 @@
 [package]
-name = "nzi_zk_cairo"
+name = "tina_zk_cairo"
 version = "0.0.1"
 edition = "2024_07"
-# Project Nzi ZK POC (Cairo): prove a safe-to-fly decision.
+# Project TINA-X ZK POC (Cairo): prove a safe-to-fly decision.
 #
 # Why Cairo counts as "ZK": Cairo is a provable language — any Cairo program you run on a STARK
 # prover (Starknet, or the `stwo`/`cairo-prove` tooling) yields a STARK proof that the program

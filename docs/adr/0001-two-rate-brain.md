@@ -15,7 +15,7 @@ solved this: the fly stabilizes via a fast reflex (halteres, ~5–13 ms, modeled
 while slower brain circuits handle navigation and decisions (see `fly-biomimicry/`).
 
 ## Decision
-Split every Nzi agent into two loops:
+Split every TINA-X agent into two loops:
 
 - **Fast reflex loop** (`rust-core::reflex`): delayed-PD stabilizer, allocation-free,
   budgeted under `REFLEX_BUDGET_US` (13 ms), targeting `REFLEX_TARGET_HZ` (500 Hz).

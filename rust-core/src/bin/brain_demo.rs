@@ -4,10 +4,10 @@
 //! questions through the [`SubprocessBrain`] and prints the answers, so you can *see* the
 //! Rust↔MeTTa bridge working.
 //!
-//! Run:  cargo run -p nzi-core --bin brain-demo
+//! Run:  cargo run -p tina-core --bin brain-demo
 //! (Requires the venv from docs/DEV_SETUP.md; otherwise it prints a friendly setup hint.)
 
-use nzi_core::brain::{MettaQuery, SubprocessBrain, SymbolicBrain};
+use tina_core::brain::{MettaQuery, SubprocessBrain, SymbolicBrain};
 use std::path::PathBuf;
 
 fn project_root() -> PathBuf {
@@ -20,7 +20,7 @@ fn project_root() -> PathBuf {
 }
 
 fn main() {
-    println!("Project Nzi — Rust <-> MeTTa bridge demo (P0.4)");
+    println!("Project TINA-X — Rust <-> MeTTa bridge demo (P0.4)");
 
     let brain = SubprocessBrain::from_project_root(project_root());
 
