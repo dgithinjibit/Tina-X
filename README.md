@@ -1,161 +1,164 @@
-# 🪰 Project Nzi — Bio-Inspired Autonomous Swarms for a Better 2030
+# Project Nzi — MeTTa reasoning for resilient autonomous systems
 
-> **Nzi** means *fly* in Swahili. We borrow the fly's biology — its reflexes, its eyes,
-> its resilience, its swarm behavior — to build cheap, decentralized robots that do
-> tangible public good: **protecting crops, warning communities of harsh weather, and
-> monitoring the living world.** Not war. A good life.
+> **Nzi** means “fly” in Swahili. The fly is our control-system inspiration, not the product boundary. Project Nzi is a MeTTa/Hyperon-centered research project that gives autonomous agents a symbolic reasoning and verification layer, then connects that layer to fast control, decentralized swarms, agriculture, weather, and infrastructure-resilience applications.
 
----
+## The one-sentence pitch
 
-## 🌍 Vision
+**Nzi turns MeTTa rules into an auditable supervisory brain for autonomous systems: the symbolic layer proposes and explains a decision, a typed Rust gate verifies it, and a fast reflex loop executes it without allowing slow inference to destabilize control.**
 
-Nature already solved autonomy. A housefly stabilizes itself in **~13 ms** with no GPS, no
-datacenter, and a brain smaller than a grain of rice — and flies coordinate as swarms with no
-central controller. Project Nzi treats the fly as a *design spec*: a fleet of low-cost,
-collision-tolerant agents, each running a fast biological reflex loop and a slow **symbolic
-reasoning** brain (MeTTa/Hyperon), coordinating as a **self-organizing nervous system**.
+This is the part judges should evaluate first. The robotics, fly biomimicry, weather, agriculture, and TINA-X work are applications and research tracks built around the same thesis: **learned or sensed signals are not enough when a system must reason about constraints, dependencies, exceptions, and novel combinations of events.**
 
-The goal for 2030 isn't apocalypse-prevention theater — it's a **good life**: fewer pesticides
-on our food, earlier warnings before a hailstorm hits a village, healthier ecosystems we can
-actually see.
+## Why this is a MeTTa/Hyperon project
 
----
+Hyperon’s Atomspace is a dynamic metagraph for representing knowledge, while MeTTa combines functional, logical, and process-calculus ideas and operates by querying and rewriting Atomspaces [1]. Nzi uses those properties directly rather than mentioning MeTTa as a decorative AI label.
 
-## 🎯 What Nzi does (focused, not everything-at-once)
+The repository contains executable MeTTa rules and bridges for:
 
-**Primary wedge — Precision Agriculture Swarms.**
-Bio-inspired agents that identify individual weeds and pests in real time and apply precise,
-minimal treatment — cutting pesticide use while improving yield. *(This is a directly named
-Y Combinator S26 funding priority, opened personally by Garry Tan.)*
-
-**Flagship edge case — Harsh-Weather Nowcasting.**
-The same swarm doubles as a distributed sensor fleet for **calibrated, energy-efficient
-severe-weather prediction** (hail, severe convection) — improving *reliability and lead time*
-so communities and the swarm itself can act before the storm. See
-[`weather-prediction/`](./weather-prediction/).
-
-**Secondary narrative — Environmental & ecosystem monitoring.**
-Air/water/biodiversity sensing with the same cheap, resilient agents.
-
-**Flagship reasoning application — [TINA-X](./tina-x/).**
-A symbolic **cascading-failure reasoner**: a digital twin of society's fragility. It ingests
-infrastructure dependencies (hospitals, grids, roads, fuel, data centers) into a MeTTa Atomspace
-and *deduces* catastrophic cascades from compound "black swan" events it was never trained on
-(earthquake → grid down → generator needs fuel → typhoon floods the road → hospital fails). This
-is where symbolic AI beats deep learning. TINA-X is an **independent component** — it runs and is
-tested standalone, and can optionally push alerts to the Nzi dashboard (see ADR 0005). Nzi's cheap
-sensor-swarm becomes one of TINA-X's live data feeds.
-
----
-
-## 🧬 The idea: borrow the fly's design
-
-| Fly trait | What it gives us | Nzi design decision |
+| MeTTa/Hyperon contribution | What is implemented in Nzi | Why it matters |
 |---|---|---|
-| Halteres (gyroscopic) | Attitude stability in ~5–13 ms | Fast rate-gyro **reflex loop** |
-| PD sensorimotor control | Simple, robust low-level control | Delayed-PD stabilizer per agent |
-| Compound-eye optic flow | GPS-free navigation | Lightweight optic-flow obstacle avoidance |
-| Collision *tolerance* | Cheap survivable bodies | Crash-and-recover, obstacle-agnostic controllers |
-| Swarm behavior | Decentralized coordination | **Self-organizing nervous system (SoNS)** |
+| **Typed symbolic brain seam** | `rust-core` defines `SymbolicBrain`, `MettaQuery`, `MettaResult`, a production `SubprocessBrain`, and a `FakeBrain` test double. | Rust control logic can be tested independently of a moving Hyperon runtime while still driving real MeTTa end to end. |
+| **Two-rate reasoning architecture** | MeTTa/Hyperon runs in a slow supervisory loop; the allocation-free Rust reflex loop remains separate. | A symbolic decision can be explainable without putting millisecond-to-second inference inside a high-rate control path. |
+| **Rule-based verification** | Agriculture “treat/don’t treat,” hazard guidance, quorum/cross-inhibition, supervisor gates, and decision metadata are represented as symbolic rules. | The system can expose the rule and facts behind an action instead of returning only an opaque score. |
+| **Atomspace scalability discipline** | Benchmarks and `HotWorkingSpace` enforce a small working space and discourage naive full-space scans. | Nzi turns an observed Hyperon performance risk into an explicit architectural decision. |
+| **Novel-event reasoning** | TINA-X loads infrastructure dependencies into a MeTTa Atomspace and forward-chains cascading failures from compound scenarios. | The demo shows why symbolic composition is useful for events that were not present as a training example. |
+| **Cross-domain reuse** | The same symbolic pattern is applied to agriculture, weather guidance, swarm coordination, and infrastructure resilience. | The project demonstrates a reusable MeTTa reasoning substrate, not a single fly-only toy. |
 
-Details & citations: [`fly-biomimicry/`](./fly-biomimicry/).
+The official Hyperon project describes the ecosystem as active pre-alpha software and experimentation [2]. Nzi therefore labels what is measured, what is a proof of concept, and what remains aspirational instead of presenting the whole roadmap as production-ready.
 
-**The two-rate brain (core architectural principle):**
-```
-┌─ FAST reflex loop (<13 ms, on-agent) ──────────┐   ← fly halteres → PD control
-│   rate gyros → PD stabilizer → actuators       │
-└────────────────────────────────────────────────┘
-            ▲ setpoints          │ telemetry
-┌─ SLOW symbolic brain (MeTTa/Hyperon) ──────────┐   ← reasoning, verification, coordination
-│   Atomspace reasoning + verification loop       │
-└────────────────────────────────────────────────┘
-```
-> **Rule:** symbolic inference NEVER runs inside the reflex path. This is how we beat the
-> ">50 Hz control vs. slow-model-inference" bottleneck. See [`limitations-edge-cases/`](./limitations-edge-cases/).
+## The judge-facing demo
 
----
+The strongest hackathon story is a short, reproducible chain rather than a tour of every folder:
 
-## 🧠 Why it can work (and where it's hard)
-
-Autonomous agents are held back by **execution, not IQ**: CPU/tool latency (up to ~88% of
-end-to-end), agent hallucinations, control-loop vs. inference latency, edge power limits, and
-data scarcity. Our answer is **MeTTa's symbolic verifiability** as a governance layer over every
-decision — that's the moat. The honest risks (unbenchmarked Hyperon, untethered insect-scale
-power) are tracked openly in [`limitations-edge-cases/`](./limitations-edge-cases/).
-
-**Feasibility (honest, self-assessed — see roadmap for how we raise these):**
-- MeTTa/Hyperon ecosystem maturity today: **~30–40%** (pre-alpha, unbenchmarked)
-- Architectural fit for swarm/real-time/embedded: **~25–35%** (much infra we build ourselves)
-
----
-
-## 🛠️ Stack
-
-- **Rust** — agent core, reflex loop, telemetry, WASM/embedded targets.
-- **MeTTa / Hyperon (SingularityNET)** — symbolic reasoning, verification, swarm coordination.
-  *Note: Python bindings are pybind11/C-API (not PyO3).*
-- **Python** — ML training, sensor-fusion prototyping, `thrml`/probabilistic experiments.
-- **Unity + ML-Agents** — simulation, sim-to-real, synthetic data (fights data scarcity).
-- **Robonomics** — decentralized identity, telemetry, missions.
-- **Extropic `thrml` (experimental)** — thermodynamic/probabilistic compute for cheap on-device
-  inference (aspirational; see weather folder).
-
----
-
-## 📂 Project Structure
-
-```
-project-nzi/
-│
-├── ROADMAP.md              # Phased build plan — START HERE to code
-├── fly-biomimicry/         # Fly traits → Nzi design decisions (cited)
-├── limitations-edge-cases/ # What holds agents back + our mitigations (cited)
-├── weather-prediction/     # Harsh-weather nowcasting edge case (cited)
-│
-├── rust-core/              # agent core: reflex loop (fast) + MeTTa brain bridge (slow)
-│   └── src/reflex.rs, brain.rs, roofline.rs, telemetry.rs   # + bins & integration tests
-├── rust-server/            # mission-control API (axum): serves telemetry + BOM to the frontend
-├── frontend/               # React + TypeScript landing / dashboard (Vite + Vitest)
-├── zk-rust/                # ZK POC (arkworks Groth16): verifiable agent decisions
-├── zk-cairo/               # ZK POC (Cairo/Scarb): same rule, Starknet-native on-chain target
-├── tina-x/                 # 🌍 TINA-X: symbolic cascading-failure reasoner (INDEPENDENT component)
-├── metta-logic/            # symbolic layer: smoke test, benchmark, Rust bridge worker
-├── unity-sim/              # SCAFFOLD (C# ML-Agents + Rust bridge contract); built in Phase 7 (needs Unity)
-├── robonomics-integration/ # (to be built, Phase 6) identity, telemetry, missions — on testnet
-└── docs/                   # ADRs (0001–0005), benchmarks, scaling/, DEV_SETUP
+```text
+sensor / scenario facts
+        ↓
+MeTTa rules in an Atomspace
+        ↓
+reasoned proposal + explanation
+        ↓
+Rust verification gate
+        ↓
+fast reflex / swarm / dashboard action
 ```
 
----
+Run the symbolic smoke test first, then show the Rust bridge and the independent TINA-X cascade reasoner:
 
-## 🚀 Getting Started
-
-See **[`ROADMAP.md`](./ROADMAP.md)** for the phased plan and **[`docs/DEV_SETUP.md`](./docs/DEV_SETUP.md)**
-for exact commands. Quick taste:
 ```bash
-rustup default stable                 # Rust toolchain
-cargo test                            # 48 Rust tests (core + server + ZK + bridge integration)
-cargo run -p nzi-server               # mission-control API on http://127.0.0.1:8080
-cd frontend && npm install && npm run dev   # live dashboard (landing + telemetry + BOM)
+# MeTTa / Hyperon
+python3 -m venv .venv
+.venv/bin/pip install hyperon
+.venv/bin/python metta-logic/run_smoke.py
+.venv/bin/python metta-logic/bridge_worker.py '!(+ 1 2)'
+
+# TINA-X: an independent MeTTa application
+cd tina-x
+python3 -m venv .venv-tina
+.venv-tina/bin/pip install hyperon pytest
+.venv-tina/bin/python -m tina_x.demo
+.venv-tina/bin/python -m pytest
 ```
 
-### 🖥️ Mission control (for hackathon judges / YC)
-Because Nzi is an IoT project, the **[`frontend/`](./frontend/)** React app is a live,
-verifiable landing page: real reflex telemetry streamed from Rust, the two-rate-brain
-explanation, and the **bill of materials** for one agent. Start `nzi-server`, then the frontend.
+If Rust and Node are installed, run the complete software demo described in [`docs/DEV_SETUP.md`](./docs/DEV_SETUP.md). The frontend is a mission-control view of telemetry and slow-brain decisions; it is not the reasoning engine itself.
 
----
+## What Nzi is—and is not
 
-## 🤝 Contributing
+| It is | It is not yet |
+|---|---|
+| A MeTTa/Hyperon reasoning and verification layer connected to Rust. | A flight-proven insect-scale hardware platform. |
+| A two-rate architecture with measured reflex and MeTTa baselines. | Evidence that Hyperon is production-ready on constrained embedded hardware. |
+| A headless self-organizing swarm logic prototype. | A validated outdoor swarm operating at agricultural scale. |
+| A precision-agriculture decision prototype with verifiable treatment gates. | A deployed pesticide-spraying product or agronomic efficacy study. |
+| A calibrated synthetic weather-nowcasting pipeline with symbolic guidance and thermodynamic denoising experiments. | A demonstrated 99% real-world severe-weather forecast system. |
+| TINA-X, an independently runnable cascading-failure reasoner. | A complete national infrastructure digital twin. |
+| GNSS and GEOGLOWS/EO bridge work for location and hazard context. | A finished Robonomics or Unity end-to-end deployment. |
 
-We want **Rust engineers, robotics/AI researchers, ML/weather folks, and Web4 builders.**
-Every subsystem should map to a design decision in one of the three research folders. Open an
-issue or PR.
+## Research/application tracks
 
-## 📜 License
+### 1. Precision agriculture
 
-MIT — open to contributors.
+The primary application prototype uses symbolic constraints to decide whether a detected crop threat should be treated, withheld, or escalated. The important MeTTa question is not “can a model see a weed?” but “can the system justify an intervention under crop, confidence, safety, weather, and mission constraints?” See the perception pipeline in [`perception/`](./perception/) and the MeTTa agronomy rules in [`metta-logic/agronomy/`](./metta-logic/agronomy/).
 
----
+### 2. Harsh-weather nowcasting
 
-*Research foundation: all claims in the three research folders are adversarially fact-checked and
-cited. Nzi is honest about what's proven, what's aspirational, and what we have to build ourselves.*
+`weather-prediction/` combines a calibrated probabilistic baseline, symbolic hazard guidance, thermodynamic/p-bit denoising experiments, and distributed sensor/EO/GNSS inputs. Its README explicitly keeps the strongest claims honest: the unified stack, regional generalization, and real-world reliability remain open validation work.
+
+### 3. TINA-X infrastructure resilience
+
+[`tina-x/`](./tina-x/) is an **independent component**, not merely a fly application. It reasons over infrastructure dependencies—power, hospitals, roads, fuel, and other services—and derives cascading failures from compound “black swan” scenarios. It can optionally send alerts to the Nzi dashboard, but it does not require Nzi to run.
+
+### 4. Self-organizing swarms
+
+`rust-swarm/` implements headless swarm logic: neighbor-local agents, hierarchy/election, coverage, stigmergy, self-healing behavior, and a hazard overlay. It is the decentralized coordination application of the same reasoning architecture; Unity visualization and hardware integration remain later work.
+
+### 5. Verification and provenance
+
+`zk-rust/` contains a working proof/verification POC for a safe-to-fly decision. `zk-cairo/` is a dormant reference implementation. The ZK layer is a provenance and verification extension, not a claim that MeTTa rules are already proven on-chain.
+
+## Architecture
+
+```text
+                    slow, explainable loop
+┌──────────────────────────────────────────────────────────────────┐
+│ MeTTa / Hyperon Atomspace                                        │
+│ rules · dependencies · constraints · quorum · hazard guidance    │
+└───────────────┬───────────────────────┬──────────────────────────┘
+                │ proposal + explanation│ telemetry / facts
+                ▼                       ▲
+┌───────────────────────────┐   ┌─────────────────────────────────┐
+│ Rust supervisory gate      │   │ applications                    │
+│ verifies / rejects / holds │   │ agriculture · weather · TINA-X  │
+└───────────────┬───────────┘   │ swarm · dashboard · ZK POC       │
+                │ setpoint       └─────────────────────────────────┘
+                ▼
+┌──────────────────────────────────────────────────────────────────┐
+│ fast Rust reflex loop: delayed-PD stabilization and actuation     │
+└──────────────────────────────────────────────────────────────────┘
+```
+
+**Hard rule:** symbolic inference never runs inside the reflex path. The brain proposes; the gate verifies; the reflex executes.
+
+## Repository map
+
+```text
+ROADMAP.md                    phased implementation plan
+fly-biomimicry/               biological design evidence and citations
+limitations-edge-cases/       constraints, risks, and mitigations
+metta-logic/                  MeTTa rules, smoke tests, benchmarks, bridges
+rust-core/                    reflex loop, brain bridge, supervisor, agriculture, telemetry
+rust-swarm/                   headless SoNS coordination, coverage, stigmergy, GNSS, hazards
+rust-server/                  Axum mission-control API and telemetry feeds
+frontend/                     React dashboard and judge-facing telemetry view
+weather-prediction/           calibrated nowcasting and symbolic guidance experiments
+tina-x/                       independent MeTTa cascading-failure reasoner
+zk-rust/                      working Rust Groth16 verification POC
+zk-cairo/                     dormant Cairo reference implementation
+unity-sim/                    simulation scaffold and Rust bridge contract
+docs/                         setup, ADRs, benchmarks, and audit notes
+```
+
+## Hackathon verdict: promising, but not yet a winner by default
+
+**Nzi can be competitive in a MeTTa/Hyperon hackathon, but the current breadth is a liability unless the submission is framed around one undeniable symbolic demo.** The winning argument is not “we built autonomous fly swarms.” It is:
+
+> **Nzi demonstrates how MeTTa can sit above real-time agents as an auditable, reusable reasoning layer, and it proves the pattern across a safety gate, a novel infrastructure cascade, and decentralized coordination.**
+
+The project currently earns credibility from executable rules, a Rust↔MeTTa bridge, benchmarks, tests, and clear limitations. It loses points when agriculture, weather, ZK, Unity, Robonomics, and fly biology appear as equal priorities. Judges should not have to infer the MeTTa contribution from a large repository.
+
+Before submission, make the demo prove three things in under five minutes: **a rule fires**, **the explanation is visible**, and **the downstream action changes because of the symbolic result**. Use TINA-X as the clearest “novel composition” case and one agriculture or swarm gate as the embodied-action case. Put weather and the broader research paper in the appendix unless the event specifically asks for them.
+
+See [`docs/HACKATHON_GRILL.md`](./docs/HACKATHON_GRILL.md) for the adversarial questions and a submission plan.
+
+## Status and limitations
+
+This is an open research prototype. Hyperon is an active pre-alpha ecosystem [2]. Nzi’s own benchmarks are local measurements, not vendor guarantees; the MeTTa subprocess bridge is a deliberate Phase-0 integration seam; Unity, hardware, Robonomics, large-scale deployment, and field validation are not complete. The project is strongest when it shows the evidence and the boundary of each claim.
+
+## References
+
+[1]: https://hyperon.opencog.org/ "OpenCog Hyperon — Atomspace and MeTTa overview"
+[2]: https://github.com/trueagi-io/hyperon-experimental "trueagi-io/hyperon-experimental — MeTTa implementation"
+[3]: https://singularitynet.io/research/metta-programming-language/ "SingularityNET — MeTTa Programming Language"
+[4]: https://www.blockchaincentrenbo.com/events/metta-training-hackathon-2025/ "MeTTa Training/Hackathon 2025 — developer tracks"
+
+## Contributing and license
+
+We welcome MeTTa developers, symbolic-AI researchers, Rust engineers, robotics and ML practitioners, weather scientists, and Web4 builders. Every new subsystem should identify the MeTTa rule, interface, benchmark, or application claim it adds. Project Nzi is MIT licensed.
