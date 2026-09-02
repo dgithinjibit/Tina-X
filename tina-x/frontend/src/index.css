@@ -1,0 +1,88 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  body {
+    @apply bg-cyber-dark text-cyber-text font-mono;
+  }
+  
+  h1, h2, h3, h4, h5, h6 {
+    @apply font-sans font-bold;
+  }
+}
+
+@layer components {
+  /* Gen-X Cyberpunk Panel */
+  .panel {
+    @apply bg-cyber-panel border border-cyber-border rounded-md p-4;
+  }
+  
+  .panel-glow {
+    @apply panel shadow-lg shadow-neon-cyan/10;
+  }
+  
+  /* Neon button */
+  .btn-neon {
+    @apply px-4 py-2 border-2 font-bold uppercase tracking-wider transition-all duration-300
+           hover:shadow-lg disabled:opacity-50 disabled:cursor-not-allowed;
+  }
+  
+  .btn-cyan {
+    @apply btn-neon border-neon-cyan text-neon-cyan hover:shadow-neon-cyan/50 hover:bg-neon-cyan/10;
+  }
+  
+  .btn-magenta {
+    @apply btn-neon border-neon-magenta text-neon-magenta hover:shadow-neon-magenta/50 hover:bg-neon-magenta/10;
+  }
+  
+  .btn-green {
+    @apply btn-neon border-neon-green text-neon-green hover:shadow-neon-green/50 hover:bg-neon-green/10;
+  }
+  
+  /* Scanline effect overlay */
+  .scanlines {
+    position: relative;
+    overflow: hidden;
+  }
+  
+  .scanlines::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 2px;
+    background: linear-gradient(transparent, rgba(0, 255, 255, 0.3), transparent);
+    animation: scan 4s linear infinite;
+    pointer-events: none;
+    z-index: 1000;
+  }
+  
+  /* Status badges */
+  .status-badge {
+    @apply inline-flex items-center gap-1.5 px-2 py-1 rounded text-xs font-bold uppercase;
+  }
+  
+  .status-healthy {
+    @apply status-badge bg-status-healthy/20 text-status-healthy border border-status-healthy/50;
+  }
+  
+  .status-warning {
+    @apply status-badge bg-status-warning/20 text-status-warning border border-status-warning/50;
+  }
+  
+  .status-critical {
+    @apply status-badge bg-status-critical/20 text-status-critical border border-status-critical/50 animate-flicker;
+  }
+  
+  .status-offline {
+    @apply status-badge bg-status-offline/20 text-status-offline border border-status-offline/50;
+  }
+  
+  /* Glitch text effect */
+  .glitch {
+    position: relative;
+    animation: glitch 0.5s infinite;
+  }
+}
