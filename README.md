@@ -1,6 +1,6 @@
 # Project TINA-X — MeTTa reasoning for resilient autonomous systems
 
-> **TINA-X** means “fly” in Swahili. The fly is our control-system inspiration, not the product boundary. Project TINA-X is a MeTTa/Hyperon-centered research project that gives autonomous agents a symbolic reasoning and verification layer, then connects that layer to fast control, decentralized swarms, agriculture, weather, and infrastructure-resilience applications.
+> **Nzi** means “fly” in Swahili. The fly is our control-system inspiration, not the product boundary. Project TINA-X is a MeTTa/Hyperon-centered research project that gives autonomous agents a symbolic reasoning and verification layer, then connects that layer to fast control, decentralized swarms, agriculture, weather, and infrastructure-resilience applications.
 
 ## The one-sentence pitch
 
